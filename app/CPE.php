@@ -63,7 +63,7 @@ class CPE {
     private $nombre_xml;
     private $nombre_cdr;
     private $ticket;
-    private $success;
+    //private $success;
     //private $forma_comprobacion;
     private $code;
     private $cdr_response;
@@ -112,7 +112,7 @@ class CPE {
         $this->nombre_xml = "";
         $this->nombre_cdr = "";
         $this->ticket = "";
-        $this->success = "";
+        //$this->success = "";
         //$this->forma_comprobacion = "";
         $this->code = -1;
         $this->cdr_response = "";
@@ -126,19 +126,25 @@ class CPE {
     }
 
 
-    public function limpiar() {
+    public function limpiar_generar() {
         $this->codtipodocumento = "";
         $this->nombre_xml = "";
         $this->nombre_cdr = "";
-        $this->ticket = "";
-        $this->success = "99";
+        $this->nombre_documento = "";
+       
+       
+       
+    }
+
+    public function limpiar_enviar() {
+         //$this->success = "99";
         //$this->forma_comprobacion = "";
+        $this->ticket = "";
         $this->code = -1;
         $this->cdr_response = "";
         $this->observaciones = "";
         $this->codigo_error = "";
         $this->error_descripcion = "";
-        $this->nombre_documento = "";
     }
 
     public function setCodTipoDocumento($codtipodocumento) {
@@ -170,9 +176,9 @@ class CPE {
         return $this->ticket;
     }
 
-    public function getSuccess() {
-        return $this->success;
-    }
+    // public function getSuccess() {
+    //     return $this->success;
+    // }
 
     // public function getFormaComprobacion() {
     //     return $this->forma_comprobacion;
@@ -221,7 +227,7 @@ class CPE {
 
 
     public function comprobante($comprobante, $detalle_comprobante) {
-        $this->limpiar();
+        $this->limpiar_generar();
         $array_items = array();
 
         $this->codtipodocumento = $comprobante->codtipodocumento;
@@ -301,7 +307,7 @@ class CPE {
    
 
     public function resumen_diario($resumen, $detalle_resumen) {
-        $this->limpiar();
+        $this->limpiar_generar();
         $array_detail = array();
         $this->codtipodocumento = "RD"; 
         foreach ($detalle_resumen as $key => $value) {
@@ -357,7 +363,7 @@ class CPE {
     }
 
     public function comunicacion_baja($comunicacion, $detalle_comunicacion) {
-        $this->limpiar();
+        $this->limpiar_generar();
 
         $array_detail = array();
         $this->codtipodocumento = "CB"; 
@@ -389,23 +395,28 @@ class CPE {
     }
 
     public function enviar_sunat() {
+        $this->limpiar_enviar();
         $res = $this->see->send($this->cpe);
 
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
-            $this->success = "0";
+            //$this->success = "0";
         }
         
         if ($res->isSuccess()) {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
-                $this->success = "0";
+                //$this->success = "0";
                 $this->ticket = $res->getTicket();
                 
-                $res = $this->see->getStatus($this->ticket);
+                $res = $this->see->getStatus($this->ticket); 
+
+                // $statusService = new ExtService();
+                // $statusService->setClient($this->soap);
+                // $res = $statusService->getStatus($this->ticket);
             }
 
             if ($res->isSuccess()) {
                         
-                $this->success = "1";
+                //$this->success = "1";
                 //$this->forma_comprobacion = "S";
 
                 $cdr = $res->getCdrResponse();
@@ -443,7 +454,7 @@ class CPE {
 
 
     function consultar_documento_no_usar($nombre_documento, $ticket = "") {
-        $this->success = "0";
+        //$this->success = "0";
         if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
 
             $statusService = new ExtService();
@@ -461,7 +472,7 @@ class CPE {
       
         if ($res->isSuccess()) {
                         
-            $this->success = "1";
+            //$this->success = "1";
             //$this->forma_comprobacion = "SA";
 
             $cdr = $res->getCdrResponse();

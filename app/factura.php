@@ -46,7 +46,7 @@ try {
     vde.nroinscripcion,
     '6' AS codtipodocumentoidentidad,
     CASE WHEN vde.nroinscripcion=0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
-    CASE WHEN vde.nroinscripcion=0 THEN  vde.propietario ELSE vde.razonsocial END AS razon_social,
+    vde.razonsocial AS razon_social,
     CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS direccion
 
     FROM cpe.vista_documentos_electronicos AS vde

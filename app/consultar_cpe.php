@@ -77,8 +77,8 @@
 
     $ruc = $_REQUEST["ruc"];
     $codtipodocumento = $_REQUEST["codtipodocumento"];
-    $serie = $_REQUEST["serie"];
-    $correlativo = substr(str_repeat("0", 8).$_REQUEST["correlativo"], - 8);
+    $serie = trim($_REQUEST["serie"]);
+    $correlativo = trim(substr(str_repeat("0", 8).$_REQUEST["correlativo"], - 8));
     $fecha_emision = $_REQUEST["fecha_emision"];
     $importe_total = $_REQUEST["importe_total"];
     // print_r($_REQUEST);
@@ -104,7 +104,7 @@
     $comprobante = $model->query($sql)->fetch();
 
 
-    if($comprobante->nroinscripcion == "0") {
+    if($comprobante && $comprobante->nroinscripcion == "0") {
         if($comprobante->codsunat == "01") {
             $comprobante->nrodocumentoidentidad = substr($comprobante->nrodocumentoidentidad, -11, 11);
            
@@ -116,10 +116,12 @@
   
             }
         }
-            
+        
     }
 
-    $comprobante->estado_sunat = $estado_sunat;
+    if($comprobante) {
+        $comprobante->estado_sunat = $estado_sunat;
+    }
     echo json_encode($comprobante);
 
 

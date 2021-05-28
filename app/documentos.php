@@ -246,14 +246,13 @@ function generar_resumen_diario($fecha, $codemp) {
         vde.idmovimiento,
         vde.tabla,
         vde.nrodocumento,
-        vde.propietario,
         vde.direccion,
         CASE WHEN p.valor::FLOAT > 0 THEN 'S' ELSE 'N' END AS  igv_status
         FROM cpe.vista_documentos_electronicos AS vde
         LEFT JOIN reglasnegocio.parame AS p ON(p.codsuc=vde.codsuc AND p.tippar = 'IMPIGV')
         WHERE vde.codsunat='03'  AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp}
         ORDER BY vde.documentofecha ASC";
-        // die($sql_detalle_resumen);
+        //die($sql_detalle_resumen);
         $detalle_resumen = $model->query($sql_detalle_resumen)->fetchAll();
         //   echo "<pre>";
         
@@ -539,6 +538,7 @@ while($fechaCursor <= $fhasta) {
 }
 
 $response["mensaje"] = $mensajes;
+// $response["res"] = 1;
 $model->liberar();
 echo json_encode($response);
 

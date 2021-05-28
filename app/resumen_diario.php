@@ -41,7 +41,6 @@ function generar_resumen_diario($fecha, $codemp) {
         vde.idmovimiento,
         vde.tabla,
         vde.nrodocumento,
-        vde.propietario,
         vde.direccion,
         CASE WHEN p.valor::FLOAT > 0 THEN 'S' ELSE 'N' END AS  igv_status
         FROM cpe.vista_documentos_electronicos AS vde

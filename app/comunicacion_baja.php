@@ -44,9 +44,9 @@ function generar_comunicacion_baja($fecha, $codemp) {
         LEFT JOIN cpe.comunicacion_baja AS cb ON(cb.cb_id=db.cb_id)
         WHERE vde.codsunat='01'  AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp} AND vde.estado=1 /*SOLO ANULADOS*/  
         /*AND CASE WHEN cb.cb_id IS NULL THEN vde.estado_documento='A' ELSE cb.cb_id IS NULL END*/
-        AND CASE WHEN db.documento_id IS NOT NULL THEN vde.estado_documento = 'A' AND vde.documento_estado<>'I' ELSE db.documento_id IS NULL END
+        AND CASE WHEN db.documento_id IS NOT NULL THEN vde.estado_documento = 'A' AND vde.documento_estado<>'I' ELSE (CASE WHEN vde.documento_id IS NOT NULL THEN vde.estado_documento = 'A' AND vde.documento_estado='A' ELSE vde.documento_id IS NULL END) END
         ORDER BY vde.documentofecha ASC";
-       
+        //die($sql_detalle_baja);
         $detalle_comunicacion = $model->query($sql_detalle_baja)->fetchAll();
 
         

@@ -36,7 +36,8 @@ CASE WHEN cl.nrodocumento IS NULL OR cl.nrodocumento = '' THEN '00000000' ELSE  
 'cobranza.cabpagos' AS tabla,
 m.codemp,
 CASE 
-WHEN doc.documento_code=0 THEN 'ACEPTADO' 
+WHEN doc.documento_code=0 AND doc.documento_estado='A' THEN 'ACEPTADO' 
+WHEN doc.documento_code=0 AND doc.documento_estado='I' THEN 'ACEPTADO(BAJA)' 
 WHEN doc.documento_code >= 2000 AND doc.documento_code <=3999 THEN  'RECHAZADO'
 ELSE 'PENDIENTE' END AS estado_cpe,
 doc.documento_observaciones,
@@ -111,7 +112,8 @@ CASE WHEN cl.nrodocumento IS NULL OR cl.nrodocumento = '' THEN '00000000' ELSE  
 'cobranza.cabprepagos' AS tabla,
 m.codemp,
 CASE 
-WHEN doc.documento_code=0 THEN 'ACEPTADO' 
+WHEN doc.documento_code=0 AND doc.documento_estado='A' THEN 'ACEPTADO' 
+WHEN doc.documento_code=0 AND doc.documento_estado='I' THEN 'ACEPTADO(BAJA)' 
 WHEN doc.documento_code >= 2000 AND doc.documento_code <=3999 THEN  'RECHAZADO'
 ELSE 'PENDIENTE' END AS estado_cpe,
 doc.documento_observaciones,
