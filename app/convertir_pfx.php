@@ -13,6 +13,6 @@ $certificate = new X509Certificate($pfx, $password);
 $pem = $certificate->export(X509ContentType::PEM);
         
 file_put_contents(dirname(__DIR__).'/certificados/'.$nombre_certificado.'pem', $pem);
-
+chmod(dirname(__DIR__).'/certificados/'.$nombre_certificado.'pem', 0777);
 echo "1";
 ?>
