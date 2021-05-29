@@ -477,7 +477,7 @@ function crear_pdf() {
     $data["DetalleVenta"] = $detalle_comprobante;
     $data["nombre_documento"] = $datos->documento_nombre;
    
-    $URL = "http://localhost:9000/cpe/app/pdf.php";
+    $URL = "http://localhost:8080/cpe/app/pdf.php";
     //Indicamos que utilizamos el protocolo http, método post, cabecera de formulario, y los parámetros de la consulta.
     $opciones = array('http' => array(
         'method'  => 'POST',

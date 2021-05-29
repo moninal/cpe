@@ -1,0 +1,5 @@
+activar las siguientes extensiones php.ini:
+
+pg
+soap
+gd2
