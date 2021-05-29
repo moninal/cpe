@@ -1,10 +1,17 @@
 <?php
- header('Access-Control-Allow-Origin: *');
- header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
- header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+//  header('Access-Control-Allow-Origin: *');
+//  header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+//  header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
  
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 require_once("funciones.php");
-require_once dirname(__DIR__)."/PHPMailer/PHPMailerAutoload.php";
+require dirname(__DIR__).'/vendor/autoload.php';
+
+
+// require_once dirname(__DIR__)."/PHPMailer/PHPMailerAutoload.php";
 // $email = $_REQUEST["email"];
 // $idmovimiento = $_REQUEST["idmovimiento"];
 // $codemp = $_REQUEST["codemp"];
@@ -111,82 +118,89 @@ if(empty($port_emisor) || $port_emisor == NULL) {
 
 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
-    $mail = new PHPMailer;
-    $mail->isSMTP();
-    $mail->Mailer = 'smtp';
-    $mail->SMTPDebug  = 0;
-    $mail->SMTPAutoTLS = false;
-    $mail->SMTPSecure = 'ssl'; //tls, ssl
-    $mail->Host       = $host_email;
-    $mail->Port       = $port_emisor; // si no quiere con el puerto 25 poner el puerto 587, al parecer en produccion va el puerto 587 y en desarollo el puerto 25,
-    //o sino la mejor opcion es con SMTPSecure='ssl' y el puerto 665
-    $mail->SMTPAuth = true;
-    $mail->Username = $email_emisor;
-    $mail->Password = $pass_emisor;
+    $mail = new PHPMailer(true);
 
-    $mail->setFrom(utf8_decode($email_emisor), utf8_decode($empresa->razonsocial));
-    $mail->addAddress($email, $comprobante->razonsocial);
-    $mail->Subject = utf8_decode($comprobante->tipodoc_descripcion." Electrónica, ".$comprobante->serie."-".$comprobante->nrodocumentotri);
-    $mail->isHTML(true);
-    //$mail->CharSet = "UTF-8";
+    try {
+        $mail->SMTPDebug  = SMTP::DEBUG_OFF; // SMTP::DEBUG_OFF: No output, SMTP::DEBUG_SERVER: Client and server messages
+        $mail->isSMTP();
+        $mail->Host       = $host_email;
+        $mail->SMTPAuth   = true;   
+        $mail->Username = $email_emisor;
+        $mail->Password = $pass_emisor;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;  // TLS: ENCRYPTION_STARTTLS, SSL: ENCRYPTION_SMTPS
+        $mail->Port       = $port_emisor; // si no quiere con el puerto 25 poner el puerto 587, al parecer en produccion va el puerto 587 y en desarollo el puerto 25,
+        //o sino la mejor opcion es con SMTPSecure='ssl' y el puerto 665
 
-    $Contenido = "Estimado Cliente : " . $comprobante->razonsocial . " adjunto se remite los archivos correspondientes a su comprobante de pago de electrónico.";
-    $Contenido .= "<br> <br> Atentamente: " . $empresa->razonsocial;
+    
+        $mail->setFrom(utf8_decode($email_emisor), utf8_decode($empresa->razonsocial));
+        $mail->addAddress($email, $comprobante->razonsocial);
+        $mail->Subject = utf8_decode($comprobante->tipodoc_descripcion." Electrónica, ".$comprobante->serie."-".$comprobante->nrodocumentotri);
+        $mail->isHTML(true);
+   
 
-    $mail->Body = $Contenido;
+        $Contenido = "Estimado Cliente : " . $comprobante->razonsocial . " adjunto se remite los archivos correspondientes a su comprobante de pago de electrónico.";
+        $Contenido .= "<br> <br> Atentamente: " . $empresa->razonsocial;
 
-    if($pdf == "S") {
-        $_REQUEST["id"] = $idmovimiento;
-        $pdf = crear_pdf();
-        $pdf = $pdf->output();
-        file_put_contents(dirname(__DIR__)."/PDF/".nombre_documento() . ".pdf", $pdf);
-        //$pdf->stream(nombre_documento() . ".pdf", array("Attachment" => false));
+        $mail->Body = $Contenido;
 
-        $mail->addAttachment(dirname(__DIR__)."/PDF/".nombre_documento() . ".pdf");
-    }
+        if($pdf == "S") {
+            $_REQUEST["id"] = $idmovimiento;
+            $pdf = crear_pdf();
+            $pdf = $pdf->output();
+            file_put_contents(dirname(__DIR__)."/PDF/".nombre_documento() . ".pdf", $pdf);
+            //$pdf->stream(nombre_documento() . ".pdf", array("Attachment" => false));
 
-    if($xml == "S") {
-        if(empty($comprobante->documento_nombre_xml) || $comprobante->documento_nombre_xml == NULL ) {
-            $nombre_xml = nombre_documento().".xml";
-        } else {
-            $nombre_xml = $comprobante->documento_nombre_xml;
+            $mail->addAttachment(dirname(__DIR__)."/PDF/".nombre_documento() . ".pdf");
         }
 
-        //echo dirname(__DIR__)."/XML/".$nombre_xml; exit;
-        if(!file_exists(dirname(__DIR__)."/XML/".$nombre_xml)) {
-            $row = (object) $_REQUEST;
-            crear_xml($row);
-          
+        if($xml == "S") {
+            if(empty($comprobante->documento_nombre_xml) || $comprobante->documento_nombre_xml == NULL ) {
+                $nombre_xml = nombre_documento().".xml";
+            } else {
+                $nombre_xml = $comprobante->documento_nombre_xml;
+            }
+
+            //echo dirname(__DIR__)."/XML/".$nombre_xml; exit;
+            if(!file_exists(dirname(__DIR__)."/XML/".$nombre_xml)) {
+                $row = (object) $_REQUEST;
+                crear_xml($row);
+            
+            }
+            
+            $mail->addAttachment(dirname(__DIR__)."/XML/".$nombre_xml);
+        }
+
+        if($cdr == "S") {
+            if(empty($comprobante->documento_nombre_cdr) || $comprobante->documento_nombre_cdr == NULL ) {
+                $nombre_cdr = "R-".nombre_documento().".zip";
+            } else {
+                $nombre_cdr = $comprobante->documento_nombre_cdr;
+            }
+
+            if(!file_exists(dirname(__DIR__)."/CDR/".$nombre_cdr)) {
+            
+                $cpe->consulta_cdr($empresa->ruc, $comprobante->codsunat, $comprobante->serie, $comprobante->correlativo, $nombre_cdr);
+            }
+
+            $mail->addAttachment(dirname(__DIR__)."/CDR/".$nombre_cdr);
         }
         
-        $mail->addAttachment(dirname(__DIR__)."/XML/".$nombre_xml);
-    }
 
-    if($cdr == "S") {
-        if(empty($comprobante->documento_nombre_cdr) || $comprobante->documento_nombre_cdr == NULL ) {
-            $nombre_cdr = "R-".nombre_documento().".zip";
-        } else {
-            $nombre_cdr = $comprobante->documento_nombre_cdr;
-        }
-
-        if(!file_exists(dirname(__DIR__)."/CDR/".$nombre_cdr)) {
-           
-            $cpe->consulta_cdr($empresa->ruc, $comprobante->codsunat, $comprobante->serie, $comprobante->correlativo, $nombre_cdr);
-        }
-
-        $mail->addAttachment(dirname(__DIR__)."/CDR/".$nombre_cdr);
+        // if (!$mail->send()) {
+        //     $response["res"] = 2;
+        //     $response["mensaje"] = "Message could not be sent.\nMailer Error: ". $mail->ErrorInfo;
+        //     echo json_encode($response); exit;
+        // }
+        $mail->send();
+        $response["res"] = 1;
+        $response["mensaje"] = "El Correo se Envió Correctamente";
+        echo json_encode($response);
+    } catch (Exception $e) {
+        $response["res"] = 2;
+        $response["mensaje"] = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        echo json_encode($response);
     }
     
-
-    if (!$mail->send()) {
-        $response["res"] = 2;
-        $response["mensaje"] = "Message could not be sent.\nMailer Error: ". $mail->ErrorInfo;
-        echo json_encode($response); exit;
-    }
-
-    $response["res"] = 1;
-    $response["mensaje"] = "El Correo se Envió Correctamente";
-    echo json_encode($response);
 
 }
 
