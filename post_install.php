@@ -15,5 +15,13 @@
         mkdir("QR/", 0777);
     }
 
+    if(!file_exists("logs/")) {
+        mkdir("logs/", 0777);
+    }
+
+    if(!file_exists("cache/")) {
+        mkdir("cache/", 0777);
+    }
+
     echo "OK";
 ?>
