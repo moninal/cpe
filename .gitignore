@@ -8,3 +8,5 @@
 /logos/*
 /certificados/*
 /cache/*
+
+config.php
