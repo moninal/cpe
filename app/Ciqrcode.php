@@ -16,31 +16,31 @@
 class Ciqrcode
 {
 	var $cacheable = true;
-	var $cachedir = '../cache/';
-	var $errorlog = '../logs/';
+	// var $cachedir = dirname(__DIR__)."/cache/";
+	// var $errorlog = dirname(__DIR__)."/logs";
 	var $quality = true;
 	var $size = 1024;
 	
 	function __construct($config = array()) {
 		// call original library
-		include "../qrcode/qrconst.php";
-		include "../qrcode/qrtools.php";
-		include "../qrcode/qrspec.php";
-		include "../qrcode/qrimage.php";
-		include "../qrcode/qrinput.php";
-		include "../qrcode/qrbitstream.php";
-		include "../qrcode/qrsplit.php";
-		include "../qrcode/qrrscode.php";
-		include "../qrcode/qrmask.php";
-		include "../qrcode/qrencode.php";
+		include dirname(__DIR__)."/qrcode/qrconst.php";
+		include dirname(__DIR__)."/qrcode/qrtools.php";
+		include dirname(__DIR__)."/qrcode/qrspec.php";
+		include dirname(__DIR__)."/qrcode/qrimage.php";
+		include dirname(__DIR__)."/qrcode/qrinput.php";
+		include dirname(__DIR__)."/qrcode/qrbitstream.php";
+		include dirname(__DIR__)."/qrcode/qrsplit.php";
+		include dirname(__DIR__)."/qrcode/qrrscode.php";
+		include dirname(__DIR__)."/qrcode/qrmask.php";
+		include dirname(__DIR__)."/qrcode/qrencode.php";
 		
 		$this->initialize($config);
 	}
 	
 	public function initialize($config = array()) {
 		$this->cacheable = (isset($config['cacheable'])) ? $config['cacheable'] : $this->cacheable;
-		$this->cachedir = (isset($config['cachedir'])) ? $config['cachedir'] : $this->cachedir;
-		$this->errorlog = (isset($config['errorlog'])) ? $config['errorlog'] : $this->errorlog;
+		// $this->cachedir = (isset($config['cachedir'])) ? $config['cachedir'] : $this->cachedir;
+		// $this->errorlog = (isset($config['errorlog'])) ? $config['errorlog'] : $this->errorlog;
 		$this->quality = (isset($config['quality'])) ? $config['quality'] : $this->quality;
 		$this->size = (isset($config['size'])) ? $config['size'] : $this->size;
 		
@@ -48,10 +48,10 @@ class Ciqrcode
 		if (!defined('QR_CACHEABLE')) define('QR_CACHEABLE', $this->cacheable);
 		
 		// used when QR_CACHEABLE === true
-		if (!defined('QR_CACHE_DIR')) define('QR_CACHE_DIR', $this->cachedir);
+		if (!defined('QR_CACHE_DIR')) define('QR_CACHE_DIR', dirname(__DIR__)."/cache/");
 		
 		// default error logs dir
-		if (!defined('QR_LOG_DIR')) define('QR_LOG_DIR', $this->errorlog);
+		if (!defined('QR_LOG_DIR')) define('QR_LOG_DIR', dirname(__DIR__)."/logs/");
 		
 		// if true, estimates best mask (spec. default, but extremally slow; set to false to significant performance boost but (propably) worst quality code
 		if ($this->quality) {

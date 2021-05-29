@@ -48,7 +48,8 @@ use Greenter\Ws\Services\ExtService;
 use Greenter\Ws\Services\ConsultCdrService;
 
 
-require '../vendor/autoload.php';
+// require '../vendor/autoload.php';
+require_once(dirname(__DIR__)."/vendor/autoload.php");
 date_default_timezone_set("America/Lima");
 require_once("clsModel.php");
 require_once("NumerosEnLetras.php");
@@ -95,7 +96,7 @@ class CPE {
         $this->empresa = $company;
 
         $see = new See();
-        $see->setCertificate(file_get_contents('../certificados/'.$empresa->certificado_digital));
+        $see->setCertificate(file_get_contents(dirname(__DIR__).'/certificados/'.$empresa->certificado_digital));
         $see->setService($endpoint);
         $see->setClaveSOL($empresa->ruc, $empresa->usuario_sol, $empresa->clave_sol);
 
@@ -301,7 +302,7 @@ class CPE {
         $this->nombre_documento = $invoice->getName();
         $xml = $this->see->getXmlSigned($invoice);
         //$this->see->getFactory()->getLastXml(); // eso solo funciona cuando primero envias el send como en los ejemplos de greenter, pero como yo primero genero el xml utilizo la otra funcion para obtener el xml $this->see->getXmlSigned($invoice)
-        $this->writeXml($invoice->getName(), $xml, "../XML");
+        $this->writeXml($invoice->getName(), $xml, dirname(__DIR__)."/XML");
     }
 
    
@@ -359,7 +360,7 @@ class CPE {
         $this->nombre_xml = $sum->getName() . '.xml';
         $this->nombre_documento = $sum->getName();
         $xml = $this->see->getXmlSigned($sum);
-        $this->writeXml($sum->getName(), $xml, "../XML");
+        $this->writeXml($sum->getName(), $xml, dirname(__DIR__)."/XML");
     }
 
     public function comunicacion_baja($comunicacion, $detalle_comunicacion) {
@@ -391,7 +392,7 @@ class CPE {
         $this->nombre_xml = $voided->getName() . '.xml';
         $this->nombre_documento = $voided->getName();
         $xml = $this->see->getXmlSigned($voided);
-        $this->writeXml($voided->getName(), $xml, "../XML");
+        $this->writeXml($voided->getName(), $xml, dirname(__DIR__)."/XML");
     }
 
     public function enviar_sunat() {
@@ -420,7 +421,7 @@ class CPE {
                 //$this->forma_comprobacion = "S";
 
                 $cdr = $res->getCdrResponse();
-                $this->writeCdr($this->cpe->getName(), $res->getCdrZip(), "../CDR");
+                $this->writeCdr($this->cpe->getName(), $res->getCdrZip(), dirname(__DIR__)."/CDR");
 
                 $this->cdr_response = $cdr->getDescription();
                 $this->nombre_cdr = 'R-' . $this->cpe->getName() . '.zip';
@@ -466,7 +467,7 @@ class CPE {
             $sender = new BillSender();
             $sender->setClient($this->soap);
           
-            $xml = file_get_contents("../XML/".$nombre_documento.'.xml');
+            $xml = file_get_contents(dirname(__DIR__)."/XML/".$nombre_documento.'.xml');
             $res = $sender->send($nombre_documento, $xml);
         }
       
@@ -476,7 +477,7 @@ class CPE {
             //$this->forma_comprobacion = "SA";
 
             $cdr = $res->getCdrResponse();
-            $this->writeCdr($nombre_documento, $res->getCdrZip(), "../CDR");
+            $this->writeCdr($nombre_documento, $res->getCdrZip(), dirname(__DIR__)."/CDR");
 
             $this->cdr_response = $cdr->getDescription();
             $this->nombre_cdr = 'R-' . $nombre_documento . '.zip';
@@ -535,7 +536,7 @@ class CPE {
         $rucEmisor = $ruc;
         $tipoDocumento = $codtipodocumento; // 01: Factura, 07: Nota de Crédito, 08: Nota de Débito
         $serie =  $serie;
-        $correlativo = $correlativo;
+        $correlativo = (int)$correlativo;
         $result = $service->getStatusCdr($rucEmisor, $tipoDocumento, $serie, $correlativo);
 
 
@@ -552,7 +553,7 @@ class CPE {
 
        // file_put_contents('R-20000000001-01-F001-1.zip', $result->getCdrZip());
 
-        $this->writeCdr($nombre_cdr, $result->getCdrZip(), "../CDR");
+        $this->writeCdr($nombre_cdr, $result->getCdrZip(), dirname(__DIR__)."/CDR");
         //var_dump($cdr);
     }
 

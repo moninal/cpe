@@ -332,7 +332,7 @@ function crear_codigo_qr($datos) {
 
     $params['level']    = 'H';
     $params['size']     = 3;
-    $params['savename'] = "../QR/" . $datos->documento_nombre . '.png';
+    $params['savename'] = dirname(__DIR__)."/QR/" . $datos->documento_nombre . '.png';
     //print_r($params); exit;
     return $ciqrcode->generate($params);
 
@@ -506,7 +506,7 @@ function crear_pdf() {
     // Renderizamos el documento PDF.
     $pdf->render();
 
-    $response = array();
+    // $response = array();
     // $response["pdf"] = $pdf;
     // $response["documento_nombre"] = $datos->documento_nombre;
     return $pdf;

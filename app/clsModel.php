@@ -2,7 +2,8 @@
 // creado por manuel 25/03/2021
 
 if(!isset($conexion)) {
-    require_once("../config.php");
+    require_once(dirname(__DIR__)."/config.php");
+    //require_once("../config.php");
 
 }
 

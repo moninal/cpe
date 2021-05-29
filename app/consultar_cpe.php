@@ -6,8 +6,8 @@
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
 
-    
-    require '../vendor/autoload.php';
+    require_once(dirname(__DIR__)."/vendor/autoload.php");
+    // require '../vendor/autoload.php';
     require_once("clsModel.php");
 
     $empresa = $model->query("SELECT * FROM admin.empresas")->fetch();
@@ -73,15 +73,23 @@
     
 
 
+    // print_r($_REQUEST); exit;
 
+    // $ruc = $_REQUEST["ruc"];
+    // $codtipodocumento = $_REQUEST["codtipodocumento"];
+    // $serie = trim($_REQUEST["serie"]);
+    // $correlativo = trim(substr(str_repeat("0", 8).$_REQUEST["correlativo"], - 8));
+    // $fecha_emision = $_REQUEST["fecha_emision"];
+    // $importe_total = $_REQUEST["importe_total"];
 
-    $ruc = $_REQUEST["ruc"];
-    $codtipodocumento = $_REQUEST["codtipodocumento"];
-    $serie = trim($_REQUEST["serie"]);
-    $correlativo = trim(substr(str_repeat("0", 8).$_REQUEST["correlativo"], - 8));
-    $fecha_emision = $_REQUEST["fecha_emision"];
-    $importe_total = $_REQUEST["importe_total"];
-    // print_r($_REQUEST);
+    $ruc = isset($argv[1]) ? $argv[1] : "";
+    $codtipodocumento = isset($argv[2]) ? $argv[2] : "";
+    $serie = isset($argv[3]) ? trim($argv[3]) : "";
+    $correlativo = isset($argv[4]) ? trim(substr(str_repeat("0", 8).$argv[4], - 8)) : "";
+
+    $fecha_emision = isset($argv[5]) ? trim($argv[5]) : "";
+    $importe_total = isset($argv[6]) ? trim($argv[6]) : "";
+    // print_r($ruc); exit;
 
     $sql = "SELECT 
     CASE WHEN nroinscripcion=0 THEN nrodocumento ELSE cliente_numero_documento END AS nrodocumentoidentidad,

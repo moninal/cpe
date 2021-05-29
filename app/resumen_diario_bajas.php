@@ -1,8 +1,8 @@
 <?php 
 
-header('Access-Control-Allow-Origin: *');
-header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+// header('Access-Control-Allow-Origin: *');
+// header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+// header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
 // require_once("CPE.php");
 require_once("funciones.php");
@@ -152,8 +152,11 @@ function generar_resumen_diario($fecha, $codemp) {
 }
 
 
-$fdesde = CodFecha($_REQUEST["fdesde"]);
-$fhasta = CodFecha($_REQUEST["fhasta"]);
+// $fdesde = CodFecha($_REQUEST["fdesde"]);
+// $fhasta = CodFecha($_REQUEST["fhasta"]);
+
+$fdesde = CodFecha(isset($argv[1]) ? $argv[1] : "");
+$fhasta = CodFecha(isset($argv[2]) ? $argv[2] : "");
 $fechaCursor = $fdesde ;
 
 $response = array();

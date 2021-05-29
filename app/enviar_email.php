@@ -4,14 +4,37 @@
  header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
  
 require_once("funciones.php");
-require_once "../PHPMailer/PHPMailerAutoload.php";
-$email = $_REQUEST["email"];
-$idmovimiento = $_REQUEST["idmovimiento"];
-$codemp = $_REQUEST["codemp"];
-$codsuc = $_REQUEST["codsuc"];
-$nroinscripcion = $_REQUEST["nroinscripcion"];
-$codciclo = $_REQUEST["codciclo"];
-$tabla = $_REQUEST["tabla"];
+require_once dirname(__DIR__)."/PHPMailer/PHPMailerAutoload.php";
+// $email = $_REQUEST["email"];
+// $idmovimiento = $_REQUEST["idmovimiento"];
+// $codemp = $_REQUEST["codemp"];
+// $codsuc = $_REQUEST["codsuc"];
+// $nroinscripcion = $_REQUEST["nroinscripcion"];
+// $codciclo = $_REQUEST["codciclo"];
+// $tabla = $_REQUEST["tabla"];
+
+$email = isset($argv[1]) ? $argv[1] : "";
+$idmovimiento = isset($argv[2]) ? $argv[2] : "";
+$codemp = isset($argv[3]) ? $argv[3] : "";
+$codsuc = isset($argv[4]) ? $argv[4] : "";
+$nroinscripcion = isset($argv[5]) ? $argv[5] : "";
+$codciclo = isset($argv[6]) ? $argv[6] : "";
+$tabla = isset($argv[7]) ? $argv[7] : "";
+$check_pdf = isset($argv[8]) ? $argv[8] : "";
+$check_xml= isset($argv[9]) ? $argv[9] : "";
+$check_cdr= isset($argv[10]) ? $argv[10] : "";
+
+$_REQUEST["email"] = $email;
+$_REQUEST["idmovimiento"] = $idmovimiento;
+$_REQUEST["codemp"] = $codemp;
+$_REQUEST["codsuc"] = $codsuc;
+$_REQUEST["nroinscripcion"] = $nroinscripcion;
+$_REQUEST["codciclo"] = $codciclo;
+$_REQUEST["tabla"] = $tabla;
+$_REQUEST["check_pdf"] = $check_pdf;
+$_REQUEST["check_xml"] = $check_xml;
+$_REQUEST["check_cdr"] = $check_cdr;
+
 $response = array();
 
 $sql_empresa = "SELECT * FROM admin.empresas";
@@ -116,10 +139,10 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $_REQUEST["id"] = $idmovimiento;
         $pdf = crear_pdf();
         $pdf = $pdf->output();
-        file_put_contents("../PDF/".nombre_documento() . ".pdf", $pdf);
+        file_put_contents(dirname(__DIR__)."/PDF/".nombre_documento() . ".pdf", $pdf);
         //$pdf->stream(nombre_documento() . ".pdf", array("Attachment" => false));
 
-        $mail->addAttachment("../PDF/".nombre_documento() . ".pdf");
+        $mail->addAttachment(dirname(__DIR__)."/PDF/".nombre_documento() . ".pdf");
     }
 
     if($xml == "S") {
@@ -129,14 +152,14 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $nombre_xml = $comprobante->documento_nombre_xml;
         }
 
-        //echo "../XML/".$nombre_xml; exit;
-        if(!file_exists("../XML/".$nombre_xml)) {
+        //echo dirname(__DIR__)."/XML/".$nombre_xml; exit;
+        if(!file_exists(dirname(__DIR__)."/XML/".$nombre_xml)) {
             $row = (object) $_REQUEST;
             crear_xml($row);
           
         }
         
-        $mail->addAttachment("../XML/".$nombre_xml);
+        $mail->addAttachment(dirname(__DIR__)."/XML/".$nombre_xml);
     }
 
     if($cdr == "S") {
@@ -146,12 +169,12 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $nombre_cdr = $comprobante->documento_nombre_cdr;
         }
 
-        if(!file_exists("../CDR/".$nombre_cdr)) {
+        if(!file_exists(dirname(__DIR__)."/CDR/".$nombre_cdr)) {
            
             $cpe->consulta_cdr($empresa->ruc, $comprobante->codsunat, $comprobante->serie, $comprobante->correlativo, $nombre_cdr);
         }
 
-        $mail->addAttachment("../CDR/".$nombre_cdr);
+        $mail->addAttachment(dirname(__DIR__)."/CDR/".$nombre_cdr);
     }
     
 
