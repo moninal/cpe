@@ -10,3 +10,4 @@
 /cache/*
 
 config.php
+composer.lock
