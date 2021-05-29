@@ -3,3 +3,6 @@ activar las siguientes extensiones php.ini:
 pg
 soap
 gd2
+
+
+poner en el puerto 8080 el apache 
