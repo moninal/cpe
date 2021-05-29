@@ -23,5 +23,13 @@
         mkdir("cache/", 0777);
     }
 
+    if(!file_exists("logos/")) {
+        mkdir("logos/", 0777);
+    }
+
+    if(!file_exists("certificados/")) {
+        mkdir("certificados/", 0777);
+    }
+
     echo "OK";
 ?>
