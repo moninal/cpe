@@ -167,7 +167,7 @@
         <div id="cabecera">
             <div class="row">
                 <div id="logo" class="col" style="width: 31%; padding-right: 5px; border-right: 1px solid black;">
-                    <img height="90"  src="http://localhost:9000/cpe/logos/<?php echo $_REQUEST["Empresa"]["empresa_logo"]; ?>" alt="">
+                    <img height="90"  src="http://localhost:8080/cpe/logos/<?php echo $_REQUEST["Empresa"]["empresa_logo"]; ?>" alt="">
                 </div>
                 <div id="Empresa" class="col" style="width: 36%;">
                     <div class="enfasis"><?php echo $_REQUEST["Empresa"]["empresa_razonsocial"]; ?></div>
@@ -379,7 +379,7 @@
             <div class="row">
                 <div class="col" style="width: 50%; height: 180px; border-right: 1px solid #494949;">
 				
-                    <img style="width: 53%; margin: 0 auto;" src="http://localhost:9000/cpe//QR/<?php echo $_REQUEST["nombre_documento"].".png"; ?>" alt="">
+                    <img style="width: 53%; margin: 0 auto;" src="http://localhost:8080/cpe//QR/<?php echo $_REQUEST["nombre_documento"].".png"; ?>" alt="">
 					
                 </div>
                 <div class="col" style="width: 47%; height: 180px; padding: 1%, 2%; line-height: 13px;" >
