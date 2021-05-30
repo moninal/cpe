@@ -399,6 +399,10 @@ class CPE {
         $this->limpiar_enviar();
         $res = $this->see->send($this->cpe);
 
+        do {
+            $res = $this->see->send($this->cpe);
+        } while (!$res->isSuccess());
+
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
             //$this->success = "0";
         }
@@ -407,8 +411,10 @@ class CPE {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
                 //$this->success = "0";
                 $this->ticket = $res->getTicket();
+                do {
+                    $res = $this->see->getStatus($this->ticket); 
+                } while (!$res->isSuccess());
                 
-                $res = $this->see->getStatus($this->ticket); 
 
                 // $statusService = new ExtService();
                 // $statusService->setClient($this->soap);
