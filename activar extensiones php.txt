@@ -5,4 +5,4 @@ soap
 gd2
 
 
-poner en el puerto 8080 el apache 
+poner en el puerto 9000 el apache 
