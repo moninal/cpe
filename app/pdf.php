@@ -8,11 +8,11 @@
     if($_REQUEST["tipodoc_id"] == "01" || $_REQUEST["tipodoc_id"] == "03" ) {
         $TipoDocumento =  $_REQUEST["Venta"]["tipodoc_descripcion"];
         $Documento =  $_REQUEST["Venta"]["venta_documento"];
-        $Cliente =  $_REQUEST["Venta"]["cliente_nombres"];
+        $Cliente =  utf8_decode($_REQUEST["Venta"]["cliente_nombres"]);
         $NroDocumentoI =  $_REQUEST["Venta"]["cliente_numero_documento"];
         $Fecha =  $_REQUEST["Venta"]["venta_fecha"];
         //$Hora =  $_REQUEST["Venta"]["venta_hora"];
-        $Direccion =  $_REQUEST["Venta"]["cliente_direccion"];
+        $Direccion =  utf8_decode($_REQUEST["Venta"]["cliente_direccion"]);
         $Total =  number_format($_REQUEST["Venta"]["venta_total"],2);
         $valor_venta =  number_format($_REQUEST["Venta"]["valor_venta"],2);
         $FormaPago =  $_REQUEST["Venta"]["fp_descripcion"];
@@ -167,12 +167,12 @@
         <div id="cabecera">
             <div class="row">
                 <div id="logo" class="col" style="width: 31%; padding-right: 5px; border-right: 1px solid black;">
-                    <img height="90"  src="http://localhost:9000/cpe/logos/<?php echo $_REQUEST["Empresa"]["empresa_logo"]; ?>" alt="">
+                    <img height="90"  src="http://localhost:9000/cpe/logos/<?php echo utf8_decode($_REQUEST["Empresa"]["empresa_logo"]); ?>" alt="">
                 </div>
                 <div id="Empresa" class="col" style="width: 36%;">
-                    <div class="enfasis"><?php echo $_REQUEST["Empresa"]["empresa_razonsocial"]; ?></div>
-                    <?php echo $_REQUEST["Empresa"]["empresa_direccion"]; ?><br>
-                    <?php echo "EMAIL: ".$_REQUEST["Empresa"]["empresa_email"]; ?><br>
+                    <div class="enfasis"><?php echo utf8_decode($_REQUEST["Empresa"]["empresa_razonsocial"]); ?></div>
+                    <?php echo utf8_decode($_REQUEST["Empresa"]["empresa_direccion"]); ?><br>
+                    <?php echo "EMAIL: ".utf8_decode($_REQUEST["Empresa"]["empresa_email"]); ?><br>
                     <?php echo "TELF: ".$_REQUEST["Empresa"]["empresa_telefonos"]; ?>
                 </div>
                 <div id="documento" class="col" style="width:28%; border-radius: 5px; border: 1px solid #494949">
