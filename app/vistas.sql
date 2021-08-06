@@ -59,7 +59,7 @@ doc.documento_nombre
 FROM cobranza.cabpagos M
 INNER JOIN reglasnegocio.documentos co ON ( M.coddocumento = co.coddocumento AND M.codsuc = co.codsuc )
 INNER JOIN ADMIN.sucursales suc ON ( suc.codemp = M.codemp AND M.codsuc = suc.codsuc ) 
-INNER JOIN catastro.clientes AS cl ON(cl.codemp=m.codemp AND cl.codsuc=m.codsuc AND cl.nroinscripcion=m.nroinscripcion)
+LEFT JOIN catastro.clientes AS cl ON(cl.codemp=m.codemp AND cl.codsuc=m.codsuc AND cl.nroinscripcion=m.nroinscripcion)
 LEFT JOIN cpe.documentos AS doc ON (doc.codemp=m.codemp AND doc.codsuc=m.codsuc AND doc.nrooperacion=m.nropago AND doc.codciclo=m.codciclo AND doc.nroinscripcion=m.nroinscripcion AND doc.tabla='cobranza.cabpagos')
 WHERE co.codsunat IS NOT NULL AND M.coddocumento IN ( 13, 14 )
 
@@ -136,7 +136,7 @@ FROM cobranza.cabprepagos M
 INNER JOIN cobranza.detprepagos md ON ( M.codemp = md.codemp AND M.codsuc = md.codsuc AND M.nroprepago = md.nroprepago AND M.nroinscripcion = md.nroinscripcion AND M.codzona = md.codzona )
 INNER JOIN reglasnegocio.documentos co ON ( md.coddocumento = co.coddocumento AND M.codsuc = co.codsuc )
 INNER JOIN ADMIN.sucursales suc ON ( suc.codemp = M.codemp AND M.codsuc = suc.codsuc )
-INNER JOIN catastro.clientes AS cl ON(cl.codemp=m.codemp AND cl.codsuc=m.codsuc AND cl.nroinscripcion=m.nroinscripcion)
+LEFT JOIN catastro.clientes AS cl ON(cl.codemp=m.codemp AND cl.codsuc=m.codsuc AND cl.nroinscripcion=m.nroinscripcion)
 LEFT JOIN cpe.documentos AS doc ON (doc.codemp=m.codemp AND doc.codsuc=m.codsuc AND doc.nrooperacion=m.nroprepago AND doc.codciclo=m.codciclo AND doc.nroinscripcion=m.nroinscripcion AND doc.tabla='cobranza.cabprepagos')
 
 LEFT JOIN ( SELECT c2.serie, c2.nrodocumentotri, c2.codsuc, c2.codemp, c2.nroinscripcion, c2.codzona 

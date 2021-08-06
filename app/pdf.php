@@ -12,7 +12,7 @@
         $NroDocumentoI =  $_REQUEST["Venta"]["cliente_numero_documento"];
         $Fecha =  $_REQUEST["Venta"]["venta_fecha"];
         //$Hora =  $_REQUEST["Venta"]["venta_hora"];
-        $Direccion =  $_REQUEST["Venta"]["cliente_direccion"];
+        $Direccion =  (isset($_REQUEST["Venta"]["cliente_direccion"])) ? $_REQUEST["Venta"]["cliente_direccion"] : "";
         $Total =  number_format($_REQUEST["Venta"]["venta_total"],2);
         $valor_venta =  number_format($_REQUEST["Venta"]["valor_venta"],2);
         $FormaPago =  $_REQUEST["Venta"]["fp_descripcion"];
