@@ -99,10 +99,10 @@ WHEN doc.documento_success IS NULL THEN 'NO EMITIDO' END AS estado_cpe,*/
 doc.documento_cdr_response,
 
 m.codciclo,
-SUM(m.subtotal) AS subtotal,
-SUM(m.igv) AS igv,
-SUM(m.imptotal) AS imptotal,
-SUM(m.redondeo) AS redondeo,
+AVG(m.subtotal) AS subtotal,
+AVG(m.igv) AS igv,
+AVG(m.imptotal) AS imptotal,
+AVG(m.redondeo) AS redondeo,
 CASE 
 WHEN cl.codtipodocumento = 1 THEN 1
 WHEN cl.codtipodocumento = 2 THEN 4
