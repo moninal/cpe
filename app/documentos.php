@@ -109,7 +109,8 @@ function generar_comprobante($row) {
         (vde.subtotal + vde.igv) AS subtotal,
     
         vde.igv AS total_impuestos,
-        '".$igv_status."' AS igv_status,
+        /*'".$igv_status."' AS igv_status,*/
+        CASE WHEN vde.igv > 0 THEN 'S' ELSE 'N' END AS igv_status,
         ".$igv->valor." AS porcentaje_igv,
         'N' AS icbper_status,
         CASE WHEN vde.estado = 1 AND vde.codsunat='03' THEN 'I' ELSE 'A' END estado
@@ -160,7 +161,8 @@ function generar_comprobante($row) {
         d.importe AS valor_unitario,
         d.importe AS valor_venta,
         d.importe * $igv->valor / 100 AS igv,
-        ".$codtipoigv." AS codtipoigv,
+        /*".$codtipoigv." AS codtipoigv,*/
+        CASE WHEN c.afecto_igv = 1 THEN '10' ELSE '20' END AS codtipoigv,
         d.importe * $igv->valor / 100 AS total_impuestos,
         d.importe + (d.importe * $igv->valor / 100) AS precio_unitario
         FROM cpe.vista_documentos_electronicos AS vde
@@ -283,7 +285,8 @@ function generar_resumen_diario($fecha, $codemp) {
         vde.tabla,
         vde.nrodocumento,
         vde.direccion,
-        CASE WHEN p.valor::FLOAT > 0 THEN 'S' ELSE 'N' END AS  igv_status
+       /*CASE WHEN p.valor::FLOAT > 0 THEN 'S' ELSE 'N' END AS  igv_status*/
+        CASE WHEN vde.igv > 0 THEN 'S' ELSE 'N' END AS  igv_status
         FROM cpe.vista_documentos_electronicos AS vde
         LEFT JOIN reglasnegocio.parame AS p ON(p.codsuc=vde.codsuc AND p.tippar = 'IMPIGV')
         WHERE vde.codsunat='03'  AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp}

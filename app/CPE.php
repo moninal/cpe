@@ -248,6 +248,7 @@ class CPE {
             ->setClient($this->cliente);
         
         if($comprobante->igv_status == "S") { // S: SI, N: NO
+        
             $invoice->setMtoOperGravadas($comprobante->valor_venta); // con igv, es el monto sumando montos de impuestos, es la suma de todos los montos de valor venta del detalle en donde tipo de igv = '10'
                 
         } else {
