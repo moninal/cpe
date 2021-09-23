@@ -398,9 +398,15 @@ class CPE {
     public function enviar_sunat() {
         $this->limpiar_enviar();
         $res = $this->see->send($this->cpe);
-
+        $contador = 1;
         do {
+            // echo $contador."<br>";
+           
             $res = $this->see->send($this->cpe);
+            $contador ++;
+            if($contador == 100) {
+                break;
+            }
         } while (!$res->isSuccess());
 
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
@@ -451,7 +457,7 @@ class CPE {
         //     $this->error_descripcion = $res->getError()->getMessage();
         // }
 
-        
+        // print_r($this->code); exit;
         if (!$res->isSuccess()) {
             $this->codigo_error =  $res->getError()->getCode();
             $this->error_descripcion = $res->getError()->getMessage();
@@ -578,7 +584,7 @@ telefono,
 certificado_digital,
 usuario_sol,
 clave_sol
-FROM admin.empresas";
+FROM admin.empresas WHERE codemp={$codemp}";
 
 $empresa = $model->query($sql_empresa)->fetch();
 
@@ -596,7 +602,7 @@ $provincia = $model->query($provincia_sql)->fetch();
 
 $distrito_sql =  "SELECT * FROM public.ubigeo WHERE codubigeo='".$coddistrito."'";
 $distrito = $model->query($distrito_sql)->fetch();
-
+// print_r($distrito_sql); exit;
 $empresa->distrito = $distrito->descripcion;
 $empresa->provincia = $provincia->descripcion;
 $empresa->departamento = $departamento->descripcion;
@@ -606,9 +612,15 @@ $empresa->departamento = $departamento->descripcion;
 // exit;
 // echo SunatEndpoints::FE_PRODUCCION; exit;
 //var_dump(SunatEndpoints::FE_PRODUCCION);
-$cpe = new CPE(SunatEndpoints::FE_BETA, (object)$empresa);
+// $cpe = new CPE(SunatEndpoints::FE_BETA, (object)$empresa);
+// global $endpoint;
+if(empty($endpoint)) {
+    $endpoint = SunatEndpoints::FE_BETA;
+}
+// die($endpoint);
+$cpe = new CPE($endpoint, (object)$empresa);
 
-// print_r($cpe);
+// print_r($cpe);        
 // $array["key"] = "value";
 
 

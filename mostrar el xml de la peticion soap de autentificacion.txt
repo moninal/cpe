@@ -1,0 +1,73 @@
+primero en el archivo vendor\greenter\ws\src\Ws\Services\SoapClient.php en el constructor insertamos el trace ponemos en true o en "1"
+
+public function __construct($wsdl = '', $parameters = [])
+    {
+        if (empty($wsdl)) {
+            $wsdl = WsdlProvider::getBillPath();
+        }		
+	if (empty($parameters)) {
+		$parameters=[
+			'stream_context' => stream_context_create([
+				'ssl' => [
+					// 'ciphers'=>'AES256-SHA',
+					'verify_peer' => false,
+					'verify_peer_name' => false,
+					'allow_self_signed' => true
+				],
+			]),
+            'trace' => 1
+		];
+	}
+        parent::__construct($wsdl, $parameters);
+    }
+
+
+
+ahora nos dirigimos al aarchivo vendor\greenter\ws\src\Ws\Services\BillSender.php
+
+y pintamos el xml  asi:
+
+usando esto: print_r(htmlentities($client->__getLastRequest())); exit; nada mas
+
+ public function send(?string $filename, ?string $content): ?BaseResult
+    {
+        $client = $this->getClient();
+        $result = new BillResult();
+
+        try {
+            $zipContent = $this->compress($filename.'.xml', $content);
+            $params = [
+                'fileName' => $filename.'.zip',
+                'contentFile' => $zipContent,
+            ];
+            // print_r(get_class($client)); exit;
+            $response = $client->call('sendBill', ['parameters' => $params]);
+
+            
+            $cdrZip = $response->applicationResponse;
+            if (empty($cdrZip)) {
+                $result->setError(new Error(
+                    CustomErrorCodes::CDR_NOTFOUND_CODE,
+                    CustomErrorCodes::CDR_NOTFOUND_BILL_MSG)
+                );
+
+                return $result;
+            }
+
+            $result
+                ->setCdrResponse($this->extractResponse((string)$cdrZip))
+                ->setCdrZip($cdrZip)
+                ->setSuccess(true);
+        } catch (SoapFault $e) {
+            // print_r($client->call("__getLastRequest", []));
+            print_r(htmlentities($client->__getLastRequest())); exit;
+            print_r($this->getErrorFromFault($e)); exit;
+            $result->setError($this->getErrorFromFault($e));
+        }
+
+        return $result;
+    }
+
+
+
+referencia: https://www.it-swarm-es.com/es/php/como-veo-el-xml-real-generado-por-php-soap-clase-de-cliente/969271854/

@@ -35,7 +35,9 @@ function generar_comprobante($row) {
         }
 
         $sql_igv = "SELECT * FROM reglasnegocio.parame WHERE tippar = 'IMPIGV' AND codsuc = {$codsuc}";
+       
         $igv = $model->query($sql_igv)->fetch();
+        // print_r($igv);
         if($igv->valor > 0) {
             $igv_status = "S";
             $codtipoigv = "10";
@@ -57,7 +59,7 @@ function generar_comprobante($row) {
         FROM cpe.vista_documentos_electronicos AS vde
         WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
    
-
+        // die($sql_cliente);
         $cliente = $model->query($sql_cliente)->fetch();
 
         if($cliente->nroinscripcion == "0") {
@@ -90,9 +92,9 @@ function generar_comprobante($row) {
             throw new Exception($mensaje);
         }
     
-
+        // print_r($cliente); exit;
         $cpe->setCliente($cliente);
-
+        
 
         $sql_comprobante = "SELECT 
         vde.codsunat AS codtipodocumento,
@@ -113,10 +115,42 @@ function generar_comprobante($row) {
         CASE WHEN vde.estado = 1 AND vde.codsunat='03' THEN 'I' ELSE 'A' END estado
         FROM cpe.vista_documentos_electronicos AS vde
         WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
-        //die($sql_comprobante);
+        // die($sql_comprobante);
 
         $comprobante = $model->query($sql_comprobante)->fetch();
+        // echo $comprobante->serie;
+        // var_dump(strpos($comprobante->serie, "F"));
+        // exit;
+        if($comprobante->codtipodocumento == '01') {
+            // $comprobante->serie[0] = "F";
+            // var_dump(strpos($comprobante->serie, "F"));
+            // exit;
+            if(strpos($comprobante->serie, "F") === false) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: La serie debe ser del siguiente formato FXXX";
+                throw new Exception($mensaje);
+            }
 
+            if($cliente->codtipodocumentoidentidad != 6) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: el tipo de documento de identidad del cliente debe ser RUC porque el comprobante es una factura";
+                throw new Exception($mensaje);
+            }
+            
+            
+
+        }
+
+        if($comprobante->codtipodocumento == '03') {
+            // $comprobante->serie[0] = "B";
+            if(strpos($comprobante->serie, "B") === false) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: La serie debe ser del siguiente formato BXXX";
+                throw new Exception($mensaje);
+            }
+          
+            
+
+        }
+
+        // print_r($comprobante); exit;
 
         $sql_detalle_comprobante = "SELECT 
         d.codconcepto AS codproducto,
@@ -137,11 +171,12 @@ function generar_comprobante($row) {
 
 
         $cpe->comprobante($comprobante, $detalle_comprobante);
-
+        // print_R($cpe); exit;
         if($comprobante->codtipodocumento == "01") {
             $cpe->enviar_sunat();
+            // exit;
+            // print_r($cpe->getCode()); exit;
             $cdr_response = $cpe->getCdrResponse();
-
             if($cpe->getCode() !== 0) {
                 $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: ".$cpe->getCodigoError().": ".$cpe->getErrorDescripcion();
                 throw new Exception($mensaje);
@@ -442,24 +477,25 @@ $response = array();
 $mensajes = "";
 $contador = 1;
 while($fechaCursor <= $fhasta) {
-    
+    // echo $fechaCursor."<br>";
     // RESUMEN DIARIO
     $sql_boletas = "SELECT codemp FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='03'
     GROUP BY codemp
     ORDER BY codemp ASC";
+    // die($sql_boletas);
     $model->query($sql_boletas);
    
     if($model->NumRows() > 0) {
         $boletas = $model->query($sql_boletas);
         while($row = $boletas->fetch()) {
 
-
+          
             // NO DEBERIA EXISTIR RESUMENES ACEPTADOS EN LA FECHA CORRESPONDIENTE
             $model->query("SELECT * FROM cpe.resumenes_diarios WHERE rd_fecha_generacion='".$fechaCursor."' AND codemp={$row->codemp} AND rd_tipo='RN' AND rd_code = 0");
-         
+            // var_dump($model->NumRows()); exit;
             if($model->NumRows() <= 0) {
                 $response = validar_resumen_diario($fechaCursor, $row->codemp);
-        
+              
                 if($response["res"] == 2) {
                     // throw new Exception($response["mensaje"]);
                     $mensajes .= $response["mensaje"]."\n";
@@ -501,7 +537,7 @@ while($fechaCursor <= $fhasta) {
         while($row = $facturas->fetch()) {
             
             $sql_facturas = "SELECT * FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='01' AND codemp={$row->codemp} AND estado_cpe='PENDIENTE'";
-
+            // die($sql_facturas);
             $model->query($sql_facturas);
 
             if($model->NumRows() > 0) {
@@ -513,7 +549,7 @@ while($fechaCursor <= $fhasta) {
                        
 
                         $response = generar_comprobante($factura);
-
+                        // print_r($response); exit;
                         if($response["res"] == 2) {
                             throw new Exception($response["mensaje"]);
                         
