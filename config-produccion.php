@@ -8,6 +8,7 @@
     // $endpoint = "https://oselab.todasmisfacturas.com.pe/ol-ti-itcpfegem/billservice?wsdl";
     $endpoint = "";
     $codemp = 1;
+    $ws = "OSE"; // escoger entre OSE o SUNAT
 
     // $Servidor = "26.178.139.59";
     // $Puerto   = "5432";
