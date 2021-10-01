@@ -74,7 +74,7 @@ class CPE {
     private $endpoint;
     private $soap;
 
-    public function __construct($endpoint, $empresa) {
+    public function __construct($endpoint, $empresa, $ws) {
         
         $address = new Address();
         $address->setUbigueo($empresa->codubigeo)
@@ -98,7 +98,14 @@ class CPE {
         $see = new See();
         $see->setCertificate(file_get_contents(dirname(__DIR__).'/certificados/'.$empresa->certificado_digital));
         $see->setService($endpoint);
-        $see->setClaveSOL($empresa->ruc, $empresa->usuario_sol, $empresa->clave_sol);
+
+        if($ws == "OSE") {
+            // die($empresa->clave_sol);
+            $see->setClaveSOL("", $empresa->usuario_sol, $empresa->clave_sol);
+        } else {
+
+            $see->setClaveSOL($empresa->ruc, $empresa->usuario_sol, $empresa->clave_sol);
+        }
 
 
         $soap = new SoapClient();
@@ -405,11 +412,11 @@ class CPE {
            
             $res = $this->see->send($this->cpe);
             $contador ++;
-            if($contador == 100) {
+            if($contador == 20) {
                 break;
             }
         } while (!$res->isSuccess());
-
+        // print_r($res);
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
             //$this->success = "0";
         }
@@ -618,9 +625,11 @@ $empresa->departamento = $departamento->descripcion;
 if(empty($endpoint)) {
     $endpoint = SunatEndpoints::FE_BETA;
 }
-// die($endpoint);
-$cpe = new CPE($endpoint, (object)$empresa);
-
+// die($ws);
+$cpe = new CPE($endpoint, (object)$empresa, $ws);
+// $hash = hash('sha256', "Otic$2021");
+// $hash = hash('sha256', "emapicaOtic$2021");
+// echo $hash;
 // print_r($cpe);        
 // $array["key"] = "value";
 
