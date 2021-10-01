@@ -291,9 +291,11 @@ function generar_resumen_diario($fecha, $codemp) {
         LEFT JOIN reglasnegocio.parame AS p ON(p.codsuc=vde.codsuc AND p.tippar = 'IMPIGV')
         WHERE vde.codsunat='03'  AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp}
         ORDER BY vde.documentofecha ASC";
-        //die($sql_detalle_resumen);
+        // die($sql_detalle_resumen);
         $detalle_resumen = $model->query($sql_detalle_resumen)->fetchAll();
         //   echo "<pre>";
+
+        // print_r($resumen); exit;
         
         foreach ($detalle_resumen as $key => $value) {
             if($value->nroinscripcion == "0") {
@@ -309,7 +311,9 @@ function generar_resumen_diario($fecha, $codemp) {
         }
 
         $cpe->resumen_diario($resumen, $detalle_resumen);
+        // print_r($cpe); exit;
         $cpe->enviar_sunat();
+        // var_dump($cpe->getCode()); exit;
         if($cpe->getCode() !== 0) {
             $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
             throw new Exception($mensaje);
@@ -490,15 +494,16 @@ while($fechaCursor <= $fhasta) {
    
     if($model->NumRows() > 0) {
         $boletas = $model->query($sql_boletas);
+        
         while($row = $boletas->fetch()) {
-
+            // print_r($row);
           
             // NO DEBERIA EXISTIR RESUMENES ACEPTADOS EN LA FECHA CORRESPONDIENTE
             $model->query("SELECT * FROM cpe.resumenes_diarios WHERE rd_fecha_generacion='".$fechaCursor."' AND codemp={$row->codemp} AND rd_tipo='RN' AND rd_code = 0");
             // var_dump($model->NumRows()); exit;
             if($model->NumRows() <= 0) {
                 $response = validar_resumen_diario($fechaCursor, $row->codemp);
-              
+               
                 if($response["res"] == 2) {
                     // throw new Exception($response["mensaje"]);
                     $mensajes .= $response["mensaje"]."\n";
@@ -508,7 +513,8 @@ while($fechaCursor <= $fhasta) {
                 try {
                     $model->getPDO()->beginTransaction();
                     $response = generar_resumen_diario($fechaCursor, $row->codemp);
-
+                    // print_R($reponse);
+                    // exit;
                     if($response["res"] == 2) {
                         throw new Exception($response["mensaje"]);
                         

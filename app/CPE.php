@@ -416,7 +416,7 @@ class CPE {
                 break;
             }
         } while (!$res->isSuccess());
-        // print_r($res);
+        // print_r($res); exit;
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
             //$this->success = "0";
         }
@@ -425,8 +425,14 @@ class CPE {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
                 //$this->success = "0";
                 $this->ticket = $res->getTicket();
+                $contador = 1;
                 do {
+                    
                     $res = $this->see->getStatus($this->ticket); 
+                    $contador ++;
+                    if($contador == 20) {
+                        break;
+                    }
                 } while (!$res->isSuccess());
                 
 
