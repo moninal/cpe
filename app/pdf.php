@@ -168,10 +168,10 @@
     <div id="contenido">
         <div id="cabecera">
             <div class="row">
-                <div id="logo" class="col" style="width: 30%; padding-right: 5px; border-right: 1px solid black;">
+                <div id="logo" class="col" style="width: 25%; padding-right: 5px; border-right: 1px solid black;">
                     <img height="90"  src="http://localhost:9000/cpe/logos/<?php echo utf8_decode($_REQUEST["Empresa"]["empresa_logo"]); ?>" alt="">
                 </div>
-                <div id="Empresa" class="col" style="width: 37%;">
+                <div id="Empresa" class="col" style="width: 42%;">
                     <div class="enfasis"><?php echo utf8_decode($_REQUEST["Empresa"]["empresa_razonsocial"]); ?></div>
                     <?php echo utf8_decode($_REQUEST["Empresa"]["empresa_direccion"]); ?><br>
                     <?php echo "EMAIL: ".utf8_decode($_REQUEST["Empresa"]["empresa_email"]); ?><br>
