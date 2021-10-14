@@ -406,16 +406,16 @@ class CPE {
     public function enviar_sunat() {
         $this->limpiar_enviar();
         $res = $this->see->send($this->cpe);
-        $contador = 1;
-        do {
+        // $contador = 1;
+        // do {
             // echo $contador."<br>";
            
             $res = $this->see->send($this->cpe);
-            $contador ++;
-            if($contador == 20) {
-                break;
-            }
-        } while (!$res->isSuccess());
+        //     $contador ++;
+        //     if($contador == 20) {
+        //         break;
+        //     }
+        // } while (!$res->isSuccess());
         // print_r($res); exit;
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
             //$this->success = "0";
@@ -425,15 +425,15 @@ class CPE {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
                 //$this->success = "0";
                 $this->ticket = $res->getTicket();
-                $contador = 1;
-                do {
+                // $contador = 1;
+                // do {
                     
                     $res = $this->see->getStatus($this->ticket); 
-                    $contador ++;
-                    if($contador == 20) {
-                        break;
-                    }
-                } while (!$res->isSuccess());
+                //     $contador ++;
+                //     if($contador == 20) {
+                //         break;
+                //     }
+                // } while (!$res->isSuccess());
                 
 
                 // $statusService = new ExtService();
