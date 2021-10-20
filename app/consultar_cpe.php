@@ -5,6 +5,13 @@
     header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 
+    $ruc = isset($argv[1]) ? $argv[1] : "";
+    $codtipodocumento = isset($argv[2]) ? $argv[2] : "";
+    $serie = isset($argv[3]) ? trim($argv[3]) : "";
+    $correlativo = isset($argv[4]) ? trim(substr(str_repeat("0", 8).$argv[4], - 8)) : "";
+
+    $fecha_emision = isset($argv[5]) ? trim($argv[5]) : "";
+    $importe_total = isset($argv[6]) ? trim($argv[6]) : "";
 
     require_once(dirname(__DIR__)."/vendor/autoload.php");
     // require '../vendor/autoload.php';
@@ -39,13 +46,15 @@
             $config->setHost($config->getHostFromSettings(1))
         );
         $ruc = $empresa->ruc; // RUC de quién realiza la consulta
+        $fecha = explode("-", $fecha_emision);
+
         $cpeFilter = (new \Greenter\Sunat\ConsultaCpe\Model\CpeFilter())
                     ->setNumRuc($ruc)
-                    ->setCodComp('01') // Tipo de comprobante
-                    ->setNumeroSerie('F001')
-                    ->setNumero('8')
-                    ->setFechaEmision('19/05/2021')
-                    ->setMonto('148.3');
+                    ->setCodComp($codtipodocumento) // Tipo de comprobante
+                    ->setNumeroSerie($serie)
+                    ->setNumero($correlativo)
+                    ->setFechaEmision($fecha[2]."/".$fecha[1]."/".$fecha[0])
+                    ->setMonto($importe_total);
 
         try {
             $result = $apiInstance->consultarCpe($ruc, $cpeFilter);
@@ -82,13 +91,7 @@
     // $fecha_emision = $_REQUEST["fecha_emision"];
     // $importe_total = $_REQUEST["importe_total"];
 
-    $ruc = isset($argv[1]) ? $argv[1] : "";
-    $codtipodocumento = isset($argv[2]) ? $argv[2] : "";
-    $serie = isset($argv[3]) ? trim($argv[3]) : "";
-    $correlativo = isset($argv[4]) ? trim(substr(str_repeat("0", 8).$argv[4], - 8)) : "";
 
-    $fecha_emision = isset($argv[5]) ? trim($argv[5]) : "";
-    $importe_total = isset($argv[6]) ? trim($argv[6]) : "";
     // print_r($ruc); exit;
 
     $sql = "SELECT 
