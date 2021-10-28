@@ -53,7 +53,10 @@ require_once(dirname(__DIR__)."/vendor/autoload.php");
 date_default_timezone_set("America/Lima");
 require_once("clsModel.php");
 require_once("NumerosEnLetras.php");
+
 class CPE {
+
+   
 
     private $empresa;
     private $see;
@@ -75,7 +78,9 @@ class CPE {
     private $soap;
 
     public function __construct($endpoint, $empresa, $ws) {
-        
+
+        global $usuario_sol, $clave_sol;
+
         $address = new Address();
         $address->setUbigueo($empresa->codubigeo)
             ->setDistrito($empresa->distrito)
@@ -108,12 +113,15 @@ class CPE {
         }
 
 
-        $soap = new SoapClient($endpoint);
-        $soap->setService($endpoint);
+       
 
+        $soap = new SoapClient();
+        $soap->setService("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
         if($ws == "OSE") {
-            $soap->setCredentials($empresa->usuario_sol, $empresa->clave_sol);
+
+            $soap->setCredentials($empresa->ruc.$usuario_sol, $clave_sol);
         } else {
+
 
             $soap->setCredentials($empresa->ruc.$empresa->usuario_sol, $empresa->clave_sol);
         }

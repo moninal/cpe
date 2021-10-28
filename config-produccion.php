@@ -10,6 +10,9 @@
     $codemp = 1;
     $ws = "OSE"; // escoger entre OSE o SUNAT
 
+    $usuario_sol = "HBW2EYVW";
+    $clave_sol = "Eica20147626";
+
     // $Servidor = "26.178.139.59";
     // $Puerto   = "5432";
     // $Usuario  = "postgres"; 
