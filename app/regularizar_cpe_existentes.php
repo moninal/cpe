@@ -34,7 +34,9 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
     $ruc = $empresa->ruc; // RUC de quién realiza la consulta
     
 
-    $sql = "SELECT * FROM cpe.vista_documentos_electronicos WHERE estado_cpe <> 'ACEPTADO' AND (idmovimiento::varchar || codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) AND idmovimiento=9970";
+    $sql = "SELECT v.*, CASE WHEN v..estado = 1 AND v..codsunat='03' THEN 'I' ELSE 'A' END estado 
+    FROM cpe.vista_documentos_electronicos AS v
+     WHERE v.estado_cpe <> 'ACEPTADO' AND (v.idmovimiento::varchar || v.codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) AND v.idmovimiento=9970";
     $res = $model->query($sql);
     
     while($value = $res->fetch()) {
@@ -104,7 +106,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
                 //$datos_documentos[":documento_forma_comprobacion"] = $cpe->getFormaComprobacion();
                 $datos_documentos[":documento_observaciones"] = "";
                 $datos_documentos[":documento_fecha"] = date("Y-m-d");
-                $datos_documentos[":documento_estado"] = $value->estado;
+                $datos_documentos[":documento_estado"] = 'A';
                 $datos_documentos[":documento_nombre"] = $nombre_documento;
                 $datos_documentos[":documento_nombre_xml"] = $nombre_documento.".xml";
                 $datos_documentos[":documento_nombre_cdr"] = $documento_nombre_cdr;

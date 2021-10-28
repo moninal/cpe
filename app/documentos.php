@@ -113,6 +113,7 @@ function generar_comprobante($row) {
         CASE WHEN vde.igv > 0 THEN 'S' ELSE 'N' END AS igv_status,
         ".$igv->valor." AS porcentaje_igv,
         'N' AS icbper_status,
+        
         CASE WHEN vde.estado = 1 AND vde.codsunat='03' THEN 'I' ELSE 'A' END estado
         FROM cpe.vista_documentos_electronicos AS vde
         WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
