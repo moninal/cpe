@@ -519,7 +519,7 @@ while($fechaCursor <= $fhasta) {
             // print_r($row);
           
             // NO DEBERIA EXISTIR RESUMENES ACEPTADOS EN LA FECHA CORRESPONDIENTE
-            $model->query("SELECT * FROM cpe.resumenes_diarios WHERE rd_fecha_generacion='".$fechaCursor."' AND codemp={$row->codemp} AND rd_tipo='RN' AND rd_code = 0");
+            $model->query("SELECT * FROM cpe.resumenes_diarios WHERE rd_fecha_generacion='".$fechaCursor."' AND codemp={$row->codemp} AND rd_tipo='RN' AND rd_code IN(0, 98, 99)");
             // var_dump($model->NumRows()); exit;
             if($model->NumRows() <= 0) {
                 $response = validar_resumen_diario($fechaCursor, $row->codemp);
