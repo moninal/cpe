@@ -34,7 +34,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
     $ruc = $empresa->ruc; // RUC de quién realiza la consulta
     
 
-    $sql = "SELECT * FROM cpe.vista_documentos_electronicos WHERE estado_cpe <> 'ACEPTADO' AND (idmovimiento::varchar || codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp)";
+    $sql = "SELECT * FROM cpe.vista_documentos_electronicos WHERE estado_cpe <> 'ACEPTADO' AND (idmovimiento::varchar || codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) AND idmovimiento=9970";9970
     $res = $model->query($sql);
     
     while($value = $res->fetch()) {
@@ -68,48 +68,48 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
             }
 
             if($data->getEstadoCp() == '1') {
-                // $_REQUEST["id"] = $value->idmovimiento;
-                // $_REQUEST["codemp"] = $value->codemp;
-                // $_REQUEST["codsuc"] = $value->codsuc;
-                // $_REQUEST["nroinscripcion"] = $value->nroinscripcion;
-                // $_REQUEST["codciclo"] = $value->codciclo;
-                // $_REQUEST["tabla"] = $value->tabla;
-                // $nombre_documento = nombre_documento();
-                // $documento_nombre_cdr = "";
-                // if($value->codsunat == '01') {
+                $_REQUEST["id"] = $value->idmovimiento;
+                $_REQUEST["codemp"] = $value->codemp;
+                $_REQUEST["codsuc"] = $value->codsuc;
+                $_REQUEST["nroinscripcion"] = $value->nroinscripcion;
+                $_REQUEST["codciclo"] = $value->codciclo;
+                $_REQUEST["tabla"] = $value->tabla;
+                $nombre_documento = nombre_documento();
+                $documento_nombre_cdr = "";
+                if($value->codsunat == '01') {
                    
     
-                //     $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, "R-".$nombre_documento.".zip");
+                    // $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, "R-".$nombre_documento.".zip");
 
-                //     $cdr_response = "La Factura número " . $value->serie."-".$value->correlativo . ", ha sido aceptada";
-                //     $documento_nombre_cdr = "R-".$nombre_documento.".zip";
-                // } else {
-                //     $cdr_response = "La Boleta número " . $value->serie."-".$value->correlativo . ", ha sido aceptada";
+                    $cdr_response = "La Factura número " . $value->serie."-".$value->correlativo . ", ha sido aceptada";
+                    $documento_nombre_cdr = "R-".$nombre_documento.".zip";
+                } else {
+                    $cdr_response = "La Boleta número " . $value->serie."-".$value->correlativo . ", ha sido aceptada";
 
-                // }
+                }
 
 
-                // $datos_documentos = array();
-                // $datos_documentos[":codemp"] = $value->codemp;
-                // $datos_documentos[":codsuc"] = $value->codsuc;
-                // $datos_documentos[":codciclo"] = $value->codciclo;
-                // $datos_documentos[":nrooperacion"] = $value->idmovimiento;
-                // $datos_documentos[":nroinscripcion"] = $value->nroinscripcion;
-                // //$datos_documentos[":documento_success"] = $cpe->getSuccess();
-                // $datos_documentos[":documento_cdr_response"] = $cdr_response;
-                // $datos_documentos[":tabla"] = $value->tabla;
-                // // $datos_documentos[":documento_codigo_error"] = $cpe->getCodigoError();
-                // // $datos_documentos[":documento_error_descripcion"] = $cpe->getErrorDescripcion();
-                // $datos_documentos[":documento_code"] = 0;
-                // //$datos_documentos[":documento_forma_comprobacion"] = $cpe->getFormaComprobacion();
-                // $datos_documentos[":documento_observaciones"] = "";
-                // $datos_documentos[":documento_fecha"] = date("Y-m-d");
-                // $datos_documentos[":documento_estado"] = $value->estado;
-                // $datos_documentos[":documento_nombre"] = $nombre_documento;
-                // $datos_documentos[":documento_nombre_xml"] = $nombres_documento.".xml";
-                // $datos_documentos[":documento_nombre_cdr"] = $documento_nombre_cdr;
+                $datos_documentos = array();
+                $datos_documentos[":codemp"] = $value->codemp;
+                $datos_documentos[":codsuc"] = $value->codsuc;
+                $datos_documentos[":codciclo"] = $value->codciclo;
+                $datos_documentos[":nrooperacion"] = $value->idmovimiento;
+                $datos_documentos[":nroinscripcion"] = $value->nroinscripcion;
+                //$datos_documentos[":documento_success"] = $cpe->getSuccess();
+                $datos_documentos[":documento_cdr_response"] = $cdr_response;
+                $datos_documentos[":tabla"] = $value->tabla;
+                // $datos_documentos[":documento_codigo_error"] = $cpe->getCodigoError();
+                // $datos_documentos[":documento_error_descripcion"] = $cpe->getErrorDescripcion();
+                $datos_documentos[":documento_code"] = 0;
+                //$datos_documentos[":documento_forma_comprobacion"] = $cpe->getFormaComprobacion();
+                $datos_documentos[":documento_observaciones"] = "";
+                $datos_documentos[":documento_fecha"] = date("Y-m-d");
+                $datos_documentos[":documento_estado"] = $value->estado;
+                $datos_documentos[":documento_nombre"] = $nombre_documento;
+                $datos_documentos[":documento_nombre_xml"] = $nombres_documento.".xml";
+                $datos_documentos[":documento_nombre_cdr"] = $documento_nombre_cdr;
                 
-                // $model->insertar("cpe.documentos", $datos_documentos);
+                $model->insertar("cpe.documentos", $datos_documentos);
                
             }
 
