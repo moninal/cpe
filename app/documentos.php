@@ -493,7 +493,7 @@ while($fechaCursor <= $fhasta) {
     // die($sql_boletas);
     $model->query($sql_boletas);
    
-    if($model->NumRows() > 0) {
+    if($model->NumRows() > 10000000000) {
         $boletas = $model->query($sql_boletas);
         
         while($row = $boletas->fetch()) {
@@ -546,7 +546,7 @@ while($fechaCursor <= $fhasta) {
         $facturas = $model->query($sql_facturas);
         while($row = $facturas->fetch()) {
             
-            $sql_facturas = "SELECT * FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='01' AND codemp={$row->codemp} AND estado_cpe='PENDIENTE'";
+            $sql_facturas = "SELECT * FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='01' AND codemp={$row->codemp} AND estado_cpe='PENDIENTE' AND idmovimiento=305364";
             // die($sql_facturas);
             $model->query($sql_facturas);
 
