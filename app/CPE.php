@@ -209,6 +209,12 @@ class CPE {
     //     return $this->forma_comprobacion;
     // }
 
+    public function setCode($code) {
+        $this->code = $code;
+    }
+
+   
+
     public function getCode() {
         return $this->code;
     }
@@ -219,6 +225,10 @@ class CPE {
 
     public function getObservaciones() {
         return $this->observaciones;
+    }
+
+    public function setObservaciones($observaciones) {
+        $this->observaciones = $observaciones;
     }
 
     public function getCodigoError() {
