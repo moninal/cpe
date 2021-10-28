@@ -643,7 +643,7 @@ class CPE {
     }
 
 
-    public function consultar_resumen($ticket, $nombre_documento) {
+    public function consultar_resumenes_comunicaciones($ticket, $nombre_documento) {
         $this->limpiar_enviar();
         
         // URL del servicio.

@@ -6,7 +6,7 @@ $sql = "SELECT * FROM cpe.resumenes_diarios WHERE rd_code IN(98, 99)";
 $resumenes = $model->query($sql);
 
 while($value = $resumenes->fetch()) {
-    $cpe->consultar_resumen($value->rd_ticket, $value->rd_nombre_documento);
+    $cpe->consultar_resumenes_comunicaciones($value->rd_ticket, $value->rd_nombre_documento);
     if($cpe->getCode() === 0) {
 
         $where = array();
