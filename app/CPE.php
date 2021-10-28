@@ -115,8 +115,8 @@ class CPE {
 
        
 
-        $soap = new SoapClient();
-        $soap->setService("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
+        $soap = new SoapClient("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
+        // $soap->setService("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
         if($ws == "OSE") {
 
             $soap->setCredentials($empresa->ruc.$usuario_sol, $clave_sol);
