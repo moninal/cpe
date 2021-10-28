@@ -437,11 +437,14 @@ class CPE {
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
             //$this->success = "0";
         }
-        
+        echo "<pre>";
+        print_r($res);
         if ($res->isSuccess()) {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
                 //$this->success = "0";
                 $this->ticket = $res->getTicket();
+
+                print_r($res->getTicket());
                 // $contador = 1;
                 // do {
                     
@@ -458,6 +461,7 @@ class CPE {
                 // $res = $statusService->getStatus($this->ticket);
             }
 
+            print_r($res);
             if ($res->isSuccess()) {
                         
                 //$this->success = "1";
