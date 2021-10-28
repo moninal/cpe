@@ -410,14 +410,18 @@ function validar_resumen_diario($fecha, $codemp) {
             GROUP BY serie ORDER BY serie ASC";
             $model->query($sql_series);
 
+            // die($sql_series);
+
             //OBTENER EL ULTIMO COMPROBANTE DE UN DIA ANTERIOR A LA FECHA A GENERAR
             if($model->NumRows() > 0) {
                 $series = $model->query($sql_series);
                 while ($value = $series->fetch()) {
                     $r = $model->query("SELECT MAX(nrodocumentotri) AS nrodocumentotri 
                     FROM cpe.vista_documentos_electronicos 
-                    WHERE documentofecha<'".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp}")->fetch();
-            
+                    WHERE (to_char('".$fecha."'::date, 'YYYY')::integer - 1) < to_char(documentofecha, 'YYYY')::integer AND documentofecha<'".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp}")->fetch();
+                    // echo "SELECT MAX(nrodocumentotri) AS nrodocumentotri 
+                    // FROM cpe.vista_documentos_electronicos 
+                    // WHERE documentofecha<'".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp}";
 
                     if($r->nrodocumentotri != null) {
                         $ultimo_correlativo_boletas = (int)$r->nrodocumentotri;
@@ -430,10 +434,13 @@ function validar_resumen_diario($fecha, $codemp) {
                         $ultimo_correlativo_boletas = (int)$r->nrodocumentotri;
                     
                     }
-
+                    // echo $ultimo_correlativo_boletas."\n";
                     $boletas = $model->query("SELECT * FROM cpe.vista_documentos_electronicos 
                     WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} 
                     ORDER BY nrodocumentotri ASC");
+                    // echo "SELECT * FROM cpe.vista_documentos_electronicos 
+                    // WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} 
+                    // ORDER BY nrodocumentotri ASC";
                     $correlativo_anterior = "";
                     while ($vb = $boletas->fetch()) {
                         $correlativo = (int)$vb->nrodocumentotri;
@@ -441,7 +448,9 @@ function validar_resumen_diario($fecha, $codemp) {
                         if($correlativo == $correlativo_anterior) {
                             throw new Exception("Resumen, Fecha Generacion :".$fecha.", SE REPITE EL CORRELATIVO: ".$vb->serie."-".Formato8Caracteres($correlativo_anterior));
 
-                        }
+                        }   
+
+                        // echo $correlativo ."!=". $ultimo_correlativo_boletas."\n";
 
                         if($correlativo != $ultimo_correlativo_boletas) {
 
