@@ -438,8 +438,7 @@ class CPE {
             //$this->success = "0";
         }
         echo "<pre>";
-        print_r($res->getError()->getCode());
-        print_r($res->getError()->getMessage());
+    
         if ($res->isSuccess()) {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
                 //$this->success = "0";
@@ -495,6 +494,8 @@ class CPE {
 
         // print_r($this->code); exit;
         if (!$res->isSuccess()) {
+            print_r($res->getError()->getCode());
+            print_r($res->getError()->getMessage());
             $this->codigo_error =  $res->getError()->getCode();
             $this->error_descripcion = $res->getError()->getMessage();
         }
