@@ -34,7 +34,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
     $ruc = $empresa->ruc; // RUC de quién realiza la consulta
     
 
-    $sql = "SELECT * FROM cpe.vista_documentos_electronicos WHERE estado_cpe <> 'ACEPTADO' AND idmovimiento NOT IN(SELECT idmovimiento FROM cpe.tmp)";
+    $sql = "SELECT * FROM cpe.vista_documentos_electronicos WHERE estado_cpe <> 'ACEPTADO' AND (idmovimiento || codsuc) NOT IN(SELECT idmovimiento FROM cpe.tmp)";
     $res = $model->query($sql);
     
     while($value = $res->fetch()) {
@@ -64,7 +64,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
             }
 
             if($data->getEstadoCp() == '0') {
-                $model->insertar("cpe.tmp", array(":idmovimiento" => $value->idmovimiento));
+                $model->insertar("cpe.tmp", array(":idmovimiento" => $value->idmovimiento.$value->codsuc));
             }
 
             if($data->getEstadoCp() == '1') {
