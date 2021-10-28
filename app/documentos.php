@@ -316,7 +316,8 @@ function generar_resumen_diario($fecha, $codemp) {
         // print_r($cpe); exit;
         $cpe->enviar_sunat();
         // var_dump($cpe->getCode()); exit;
-        if($cpe->getCode() !== 0) {
+        $code = intval($cpe->getCode());
+        if($code !== 0 && $code !== 98 && $code !== 99) {
             $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
             throw new Exception($mensaje);
         }

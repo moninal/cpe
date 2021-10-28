@@ -494,8 +494,8 @@ class CPE {
 
         // print_r($this->code); exit;
         if (!$res->isSuccess()) {
-            var_dump($res->getError()->getCode());
-            var_dump($res->getError()->getMessage());
+            // var_dump($res->getError()->getCode());
+            // var_dump($res->getError()->getMessage());
             $this->codigo_error =  $res->getError()->getCode();
             $this->error_descripcion = $res->getError()->getMessage();
         }
