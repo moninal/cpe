@@ -580,23 +580,29 @@ class CPE {
         $tipoDocumento = $codtipodocumento; // 01: Factura, 07: Nota de Crédito, 08: Nota de Débito
         $serie =  $serie;
         $correlativo = (int)$correlativo;
+        // echo $rucEmisor." ".$tipoDocumento." ".$serie." ".$correlativo;
         $result = $service->getStatusCdr($rucEmisor, $tipoDocumento, $serie, $correlativo);
-
+       
 
         if (!$result->isSuccess()) {
             var_dump($result->getError());
             return;
         }
 
+
         $cdr = $result->getCdrResponse();
+        // echo "<pre>";
+        // print_r($cdr->getDescription());
+        // print_r($cdr->getNotes());
         if ($cdr === null) {
             echo 'CDR no encontrado, el comprobante no ha sido comunicado a SUNAT.';
             return;
         }
-
+       
        // file_put_contents('R-20000000001-01-F001-1.zip', $result->getCdrZip());
 
         $this->writeCdr($nombre_cdr, $result->getCdrZip(), dirname(__DIR__)."/CDR");
+        return $cdr;
         //var_dump($cdr);
     }
 
