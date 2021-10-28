@@ -34,7 +34,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
     $ruc = $empresa->ruc; // RUC de quién realiza la consulta
     
 
-    $sql = "SELECT v.*, CASE WHEN v..estado = 1 AND v..codsunat='03' THEN 'I' ELSE 'A' END estado 
+    $sql = "SELECT v.*, CASE WHEN v.estado = 1 AND v.codsunat='03' THEN 'I' ELSE 'A' END estado 
     FROM cpe.vista_documentos_electronicos AS v
      WHERE v.estado_cpe <> 'ACEPTADO' AND (v.idmovimiento::varchar || v.codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) AND v.idmovimiento=9970";
     $res = $model->query($sql);
