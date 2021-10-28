@@ -351,7 +351,13 @@ function generar_resumen_diario($fecha, $codemp) {
 
         while ($row = $documentos->fetch()) {
             if($cpe->getCode() !== 0 ) {
-                $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido aceptada");
+
+                if($row->dr_estado == "1") {
+
+                    $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido aceptada");
+                } else {
+                    $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja");
+                }
             } else {
                 $res = guardar_documento($row, $cpe, "");
             }

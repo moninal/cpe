@@ -77,6 +77,10 @@ class CPE {
     private $endpoint;
     private $soap;
 
+    private $empresa_ruc;
+    private $usuario_sol;
+    private $clave_sol;
+
     public function __construct($endpoint, $empresa, $ws) {
 
         global $usuario_sol, $clave_sol;
@@ -107,21 +111,25 @@ class CPE {
         if($ws == "OSE") {
             // die($empresa->clave_sol);
             $see->setClaveSOL("", $empresa->usuario_sol, $empresa->clave_sol);
+           
         } else {
 
             $see->setClaveSOL($empresa->ruc, $empresa->usuario_sol, $empresa->clave_sol);
         }
 
-
+        
        
-
+        $this->empresa_ruc = $empresa->ruc;
         $soap = new SoapClient("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
         // $soap->setService("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
         if($ws == "OSE") {
-
+            $this->usuario_sol = $usuario_sol;
+            $this->clave_sol = $clave_sol;
             $soap->setCredentials($empresa->ruc.$usuario_sol, $clave_sol);
         } else {
 
+            $this->usuario_sol = $empresa->usuario_sol;
+            $this->clave_sol = $empresa->clave_sol;
 
             $soap->setCredentials($empresa->ruc.$empresa->usuario_sol, $empresa->clave_sol);
         }
@@ -634,6 +642,61 @@ class CPE {
         //var_dump($cdr);
     }
 
+
+    public function consultar_resumen($ticket, $nombre_documento) {
+        $this->limpiar_enviar();
+        
+        // URL del servicio.
+        $urlService = 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService';
+        $soap = new SoapClient();
+        $soap->setService($urlService);
+        $soap->setCredentials($this->empresa_ruc.$this->usuario_sol, $this->clave_sol);
+        $statusService = new ExtService();
+        $statusService->setClient($soap);
+
+        $status = $statusService->getStatus($ticket);
+
+        if (!$status->isSuccess()) {
+            // Error en la conexion con el servicio de SUNAT
+            var_dump($status);
+            return;
+        }
+
+        $cdr = $status->getCdrResponse();
+        // file_put_contents('R-20000000001-RC-20200728-1.zip', $status->getCdrZip());
+
+        $this->writeCdr($nombre_documento, $status->getCdrZip(), dirname(__DIR__)."/CDR");
+
+        // var_dump($cdr);
+
+        $this->cdr_response = $cdr->getDescription();
+        $this->nombre_cdr = 'R-' . $nombre_documento . '.zip';
+
+
+        // Verificar CDR (Resumen aceptado o rechazado)
+        $code = (int)$cdr->getCode();
+        $this->code = $code;
+        if ($code === 0) {
+            
+            // echo 'ESTADO: ACEPTADA'.PHP_EOL;
+            if (count($cdr->getNotes()) > 0) {
+                // echo 'INCLUYE OBSERVACIONES:'.PHP_EOL;
+                // Mostrar observaciones
+                foreach ($cdr->getNotes() as $obs) {
+                    $this->observaciones .= $obs.PHP_EOL;
+                    // echo 'OBS: '.$obs.PHP_EOL;
+                }
+            }
+
+        } else if ($code >= 2000 && $code <= 3999) {
+            // echo 'ESTADO: RECHAZADA'.PHP_EOL;
+
+        } else {
+            /* Esto no debería darse, pero si ocurre, es un CDR inválido que debería tratarse como un error-excepción. */
+            /*code: 0100 a 1999 */
+            echo 'Excepción';
+        }
+    }
 
 
 }
