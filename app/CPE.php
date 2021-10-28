@@ -573,6 +573,7 @@ class CPE {
     }
 
     public function consulta_cdr($ruc, $codtipodocumento, $serie, $correlativo, $nombre_cdr) {
+        $this->limpiar_enviar();
         $service = new ConsultCdrService();
         $service->setClient($this->soap);
 
@@ -602,7 +603,18 @@ class CPE {
        // file_put_contents('R-20000000001-01-F001-1.zip', $result->getCdrZip());
 
         $this->writeCdr($nombre_cdr, $result->getCdrZip(), dirname(__DIR__)."/CDR");
-        return $cdr;
+
+        $this->cdr_response = $cdr->getDescription();
+        $this->nombre_cdr = 'R-' . $nombre_cdr . '.zip';
+
+        $code = (int)$cdr->getCode();
+        $this->code = $code;
+        if (count($cdr->getNotes()) > 0) {
+            foreach ($cdr->getNotes() as $obs) {
+                $this->observaciones .= $obs.PHP_EOL;
+            }
+        }
+        // return $cdr;
         //var_dump($cdr);
     }
 
