@@ -40,6 +40,7 @@ header("Content-type: application/cdr");
 
 if(empty($nombre_cdr) || !file_exists("../CDR/".$nombre_cdr)) {
     if($comprobante->codsunat != NULL && $comprobante->codsunat == "01") {
+        echo "olaaaa";
         $cpe->consulta_cdr($empresa->ruc, $comprobante->codsunat, $comprobante->serie, $comprobante->nrodocumentotri, $nombre_cdr);
     }
     
