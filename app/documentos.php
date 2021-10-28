@@ -262,7 +262,8 @@ function generar_resumen_diario($fecha, $codemp) {
         $correlativo = $result_correlativo->correlativo;
 
         $resumen = array();
-        $resumen["fecha_resumen"] = date("Y-m-d");
+        // $resumen["fecha_resumen"] = date("Y-m-d");
+        $resumen["fecha_resumen"] = $fecha;
         $resumen["fecha_generacion"] = $fecha;
         $resumen["correlativo"] = (string)$correlativo;
         $resumen = (object)$resumen;
