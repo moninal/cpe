@@ -410,7 +410,7 @@ class CPE {
         // do {
             // echo $contador."<br>";
            
-            $res = $this->see->send($this->cpe);
+            // $res = $this->see->send($this->cpe);
         //     $contador ++;
         //     if($contador == 20) {
         //         break;
