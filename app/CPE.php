@@ -109,7 +109,7 @@ class CPE {
 
 
         $soap = new SoapClient();
-        $soap->setService($endpoint);
+        $soap->setService(SunatEndpoints::FE_PRODUCCION);
         $soap->setCredentials($empresa->ruc.$empresa->usuario_sol, $empresa->clave_sol);
 
         $this->soap = $soap;
@@ -631,6 +631,7 @@ $empresa->departamento = $departamento->descripcion;
 if(empty($endpoint)) {
     $endpoint = SunatEndpoints::FE_PRODUCCION;
 }
+
 // die($ws);
 $cpe = new CPE($endpoint, (object)$empresa, $ws);
 // $hash = hash('sha256', "Otic$2021");

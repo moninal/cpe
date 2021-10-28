@@ -9,7 +9,7 @@
     $correlativo = isset($argv[4]) ? $argv[4] : "";
     $nombre_cdr = isset($argv[5]) ? $argv[5] : "";
  
-    echo "olaaa";
+    // echo "olaaa";
     $cpe->consulta_cdr($ruc, $codsunat, $serie, $correlativo, $nombre_cdr);
 
 ?>
