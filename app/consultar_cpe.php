@@ -110,8 +110,9 @@
     tabla,
     documento_nombre_xml,
     documento_nombre_cdr
-    FROM cpe.vista_documentos_electronicos WHERE codsunat='{$codtipodocumento}' AND serie='{$serie}' AND TRIM(to_char(nrodocumentotri::INT, '00000000'))='{$correlativo}' AND documentofecha='{$fecha_emision}'";   
-   
+    FROM cpe.vista_documentos_electronicos WHERE codsunat='{$codtipodocumento}' AND serie='{$serie}' AND TRIM(to_char(nrodocumentotri::INT, '00000000'))='{$correlativo}' AND documentofecha='{$fecha_emision}'
+    ORDER BY documento_nombre_xml ASC";   
+    // die($sql);
     $comprobante = $model->query($sql)->fetch();
 
 
