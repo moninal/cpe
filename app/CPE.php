@@ -629,7 +629,7 @@ $empresa->departamento = $departamento->descripcion;
 // $cpe = new CPE(SunatEndpoints::FE_BETA, (object)$empresa);
 // global $endpoint;
 if(empty($endpoint)) {
-    $endpoint = SunatEndpoints::FE_BETA;
+    $endpoint = SunatEndpoints::FE_PRODUCCION;
 }
 // die($ws);
 $cpe = new CPE($endpoint, (object)$empresa, $ws);
