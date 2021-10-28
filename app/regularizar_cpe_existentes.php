@@ -64,7 +64,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
             }
 
             if($data->getEstadoCp() == '0') {
-                $model->insertar("cpe.tmp", array("idmovimiento" => $value->idmovimiento));
+                $model->insertar("cpe.tmp", array(":idmovimiento" => $value->idmovimiento));
             }
 
             if($data->getEstadoCp() == '1') {
