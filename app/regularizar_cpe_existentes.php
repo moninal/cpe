@@ -36,7 +36,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
 
     $sql = "SELECT v.*, CASE WHEN v.estado = 1 AND v.codsunat='03' THEN 'I' ELSE 'A' END estado 
     FROM cpe.vista_documentos_electronicos AS v
-     WHERE v.estado_cpe <> 'ACEPTADO' AND (v.idmovimiento::varchar || v.codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp)   ";
+     WHERE v.estado_cpe <> 'ACEPTADO' AND (v.idmovimiento::varchar || v.codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) AND v.idmovimiento=303195  ";
     $res = $model->query($sql);
     
     while($value = $res->fetch()) {
@@ -69,59 +69,59 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
                 $model->insertar("cpe.tmp", array(":idmovimiento" => $value->idmovimiento.$value->codsuc));
             }
 
-            // if($data->getEstadoCp() == '1') {
-            //     $_REQUEST["id"] = $value->idmovimiento;
-            //     $_REQUEST["codemp"] = $value->codemp;
-            //     $_REQUEST["codsuc"] = $value->codsuc;
-            //     $_REQUEST["nroinscripcion"] = $value->nroinscripcion;
-            //     $_REQUEST["codciclo"] = $value->codciclo;
-            //     $_REQUEST["tabla"] = $value->tabla;
-            //     $nombre_documento = nombre_documento();
+            if($data->getEstadoCp() == '1') {
+                $_REQUEST["id"] = $value->idmovimiento;
+                $_REQUEST["codemp"] = $value->codemp;
+                $_REQUEST["codsuc"] = $value->codsuc;
+                $_REQUEST["nroinscripcion"] = $value->nroinscripcion;
+                $_REQUEST["codciclo"] = $value->codciclo;
+                $_REQUEST["tabla"] = $value->tabla;
+                $nombre_documento = nombre_documento();
            
-            //     if($value->codsunat == '01') {
+                if($value->codsunat == '01') {
                    
     
-            //         $cdr = $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, "R-".$nombre_documento);
+                    $cdr = $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, "R-".$nombre_documento);
 
-            //         // $cdr_response = "La Factura número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
-            //         $cdr_response = $cpe->getCdrResponse();
+                    // $cdr_response = "La Factura número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
+                    $cdr_response = $cpe->getCdrResponse();
 
-            //         $documento_code = $cpe->getCode();
-            //         $documento_observaciones = $cpe->getObservaciones();
-            //         $documento_nombre_cdr = $cpe->getNombreCdr();
+                    $documento_code = $cpe->getCode();
+                    $documento_observaciones = $cpe->getObservaciones();
+                    $documento_nombre_cdr = $cpe->getNombreCdr();
                  
-            //     } else {
-            //         $cdr_response = "La Boleta número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
+                } else {
+                    $cdr_response = "La Boleta número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
 
-            //         $documento_code = 0;
-            //         $documento_observaciones = "";
-            //         $documento_nombre_cdr = "";
+                    $documento_code = 0;
+                    $documento_observaciones = "";
+                    $documento_nombre_cdr = "";
 
-            //     }
+                }
 
 
-            //     $datos_documentos = array();
-            //     $datos_documentos[":codemp"] = $value->codemp;
-            //     $datos_documentos[":codsuc"] = $value->codsuc;
-            //     $datos_documentos[":codciclo"] = $value->codciclo;
-            //     $datos_documentos[":nrooperacion"] = $value->idmovimiento;
-            //     $datos_documentos[":nroinscripcion"] = $value->nroinscripcion;
+                $datos_documentos = array();
+                $datos_documentos[":codemp"] = $value->codemp;
+                $datos_documentos[":codsuc"] = $value->codsuc;
+                $datos_documentos[":codciclo"] = $value->codciclo;
+                $datos_documentos[":nrooperacion"] = $value->idmovimiento;
+                $datos_documentos[":nroinscripcion"] = $value->nroinscripcion;
    
-            //     $datos_documentos[":documento_cdr_response"] = $cdr_response;
-            //     $datos_documentos[":tabla"] = $value->tabla;
+                $datos_documentos[":documento_cdr_response"] = $cdr_response;
+                $datos_documentos[":tabla"] = $value->tabla;
               
-            //     $datos_documentos[":documento_code"] = $documento_code;
+                $datos_documentos[":documento_code"] = $documento_code;
               
-            //     $datos_documentos[":documento_observaciones"] = $documento_observaciones;
-            //     $datos_documentos[":documento_fecha"] = date("Y-m-d");
-            //     $datos_documentos[":documento_estado"] = 'A';
-            //     $datos_documentos[":documento_nombre"] = $nombre_documento;
-            //     $datos_documentos[":documento_nombre_xml"] = $nombre_documento.".xml";
-            //     $datos_documentos[":documento_nombre_cdr"] = $documento_nombre_cdr;
+                $datos_documentos[":documento_observaciones"] = $documento_observaciones;
+                $datos_documentos[":documento_fecha"] = date("Y-m-d");
+                $datos_documentos[":documento_estado"] = 'A';
+                $datos_documentos[":documento_nombre"] = $nombre_documento;
+                $datos_documentos[":documento_nombre_xml"] = $nombre_documento.".xml";
+                $datos_documentos[":documento_nombre_cdr"] = $documento_nombre_cdr;
                 
-            //     $model->insertar("cpe.documentos", $datos_documentos);
+                $model->insertar("cpe.documentos", $datos_documentos);
                
-            // }
+            }
 
 
             // echo PHP_EOL.'Estado RUC: '.$data->getEstadoRuc();
