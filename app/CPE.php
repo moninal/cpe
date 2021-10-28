@@ -108,9 +108,18 @@ class CPE {
         }
 
 
-        $soap = new SoapClient();
-        $soap->setService(SunatEndpoints::FE_PRODUCCION);
-        $soap->setCredentials($empresa->ruc.$empresa->usuario_sol, $empresa->clave_sol);
+        $soap = new SoapClient($endpoint);
+        $soap->setService($endpoint);
+
+        if($ws == "OSE") {
+            $soap->setCredentials($empresa->usuario_sol, $empresa->clave_sol);
+        } else {
+
+            $soap->setCredentials($empresa->ruc.$empresa->usuario_sol, $empresa->clave_sol);
+        }
+
+        // echo "<pre>";
+        // print_r($soap);
 
         $this->soap = $soap;
         $this->endpoint = $endpoint;
