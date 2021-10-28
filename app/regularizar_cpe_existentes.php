@@ -81,10 +81,10 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
     
                     // $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, "R-".$nombre_documento.".zip");
 
-                    $cdr_response = "La Factura número " . $value->serie."-".$value->correlativo . ", ha sido aceptada";
+                    $cdr_response = "La Factura número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
                     $documento_nombre_cdr = "R-".$nombre_documento.".zip";
                 } else {
-                    $cdr_response = "La Boleta número " . $value->serie."-".$value->correlativo . ", ha sido aceptada";
+                    $cdr_response = "La Boleta número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
 
                 }
 
@@ -106,7 +106,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
                 $datos_documentos[":documento_fecha"] = date("Y-m-d");
                 $datos_documentos[":documento_estado"] = $value->estado;
                 $datos_documentos[":documento_nombre"] = $nombre_documento;
-                $datos_documentos[":documento_nombre_xml"] = $nombres_documento.".xml";
+                $datos_documentos[":documento_nombre_xml"] = $nombre_documento.".xml";
                 $datos_documentos[":documento_nombre_cdr"] = $documento_nombre_cdr;
                 
                 $model->insertar("cpe.documentos", $datos_documentos);
