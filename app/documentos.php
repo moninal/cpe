@@ -350,7 +350,12 @@ function generar_resumen_diario($fecha, $codemp) {
         $documentos = $model->query($sql_detalle_resumen);
 
         while ($row = $documentos->fetch()) {
-            $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido aceptada");
+            if($cpe->getCode() !== 0 ) {
+                $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido aceptada");
+            } else {
+                $res = guardar_documento($row, $cpe, "");
+            }
+           
 
             $documento_id = $res->lastInsertId();
     

@@ -38,6 +38,8 @@ m.codemp,
 CASE 
 WHEN doc.documento_code=0 AND doc.documento_estado='A' THEN 'ACEPTADO' 
 WHEN doc.documento_code=0 AND doc.documento_estado='I' THEN 'ACEPTADO(BAJA)' 
+WHEN doc.documento_code=98 THEN 'EN PROCESO' 
+WHEN doc.documento_code=99 THEN 'PROCESADO CON ERRORES' 
 WHEN doc.documento_code >= 2000 AND doc.documento_code <=3999 THEN  'RECHAZADO'
 ELSE 'PENDIENTE' END AS estado_cpe,
 doc.documento_observaciones,
@@ -111,11 +113,15 @@ ELSE 0 END AS tdi_id,
 CASE WHEN cl.nrodocumento IS NULL OR cl.nrodocumento = '' THEN '00000000' ELSE  cl.nrodocumento END AS cliente_numero_documento,
 'cobranza.cabprepagos' AS tabla,
 m.codemp,
+
 CASE 
 WHEN doc.documento_code=0 AND doc.documento_estado='A' THEN 'ACEPTADO' 
 WHEN doc.documento_code=0 AND doc.documento_estado='I' THEN 'ACEPTADO(BAJA)' 
+WHEN doc.documento_code=98 THEN 'EN PROCESO' 
+WHEN doc.documento_code=99 THEN 'PROCESADO CON ERRORES' 
 WHEN doc.documento_code >= 2000 AND doc.documento_code <=3999 THEN  'RECHAZADO'
 ELSE 'PENDIENTE' END AS estado_cpe,
+
 doc.documento_observaciones,
 /*CASE 
 WHEN doc.documento_success=1 THEN 'RESUELTO' 

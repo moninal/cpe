@@ -36,7 +36,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
 
     $sql = "SELECT v.*, CASE WHEN v.estado = 1 AND v.codsunat='03' THEN 'I' ELSE 'A' END estado 
     FROM cpe.vista_documentos_electronicos AS v
-     WHERE v.estado_cpe <> 'ACEPTADO' AND (v.idmovimiento::varchar || v.codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) ";
+     WHERE v.estado_cpe IN('PENDIENTE') AND (v.idmovimiento::varchar || v.codsuc::varchar) NOT IN(SELECT idmovimiento::varchar FROM cpe.tmp) ";
     $res = $model->query($sql);
     
     while($value = $res->fetch()) {
