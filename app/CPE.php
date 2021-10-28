@@ -437,14 +437,14 @@ class CPE {
         if($this->codtipodocumento != "RD" && $this->codtipodocumento != "CB") {
             //$this->success = "0";
         }
-        echo "<pre>";
-        print_r($res);
+        // echo "<pre>";
+        // print_r($res);
         if ($res->isSuccess()) {
             if($this->codtipodocumento == "RD" || $this->codtipodocumento == "CB") {
                 //$this->success = "0";
                 $this->ticket = $res->getTicket();
 
-                print_r($res->getTicket());
+                // print_r($res->getTicket());
                 // $contador = 1;
                 // do {
                     
@@ -461,7 +461,7 @@ class CPE {
                 // $res = $statusService->getStatus($this->ticket);
             }
 
-            print_r($res);
+            // print_r($res);
             if ($res->isSuccess()) {
                         
                 //$this->success = "1";
@@ -494,8 +494,8 @@ class CPE {
 
         // print_r($this->code); exit;
         if (!$res->isSuccess()) {
-            print_r($res->getError()->getCode());
-            print_r($res->getError()->getMessage());
+            var_dump($res->getError()->getCode());
+            var_dump($res->getError()->getMessage());
             $this->codigo_error =  $res->getError()->getCode();
             $this->error_descripcion = $res->getError()->getMessage();
         }
