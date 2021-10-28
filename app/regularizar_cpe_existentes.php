@@ -81,7 +81,7 @@ if($empresa->id_consulta != "" && $empresa->clave_consulta != "" && $empresa->id
                 if($value->codsunat == '01') {
                    
     
-                    $cdr = $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, "R-".$nombre_documento);
+                    $cdr = $cpe->consulta_cdr($ruc, $value->codsunat, $value->serie, $value->nrodocumentotri, $nombre_documento);
 
                     // $cdr_response = "La Factura número " . $value->serie."-".$value->nrodocumentotri . ", ha sido aceptada";
                     $cdr_response = $cpe->getCdrResponse();

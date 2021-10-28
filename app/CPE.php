@@ -605,7 +605,7 @@ class CPE {
         $this->writeCdr($nombre_cdr, $result->getCdrZip(), dirname(__DIR__)."/CDR");
 
         $this->cdr_response = $cdr->getDescription();
-        $this->nombre_cdr = $nombre_cdr . '.zip';
+        $this->nombre_cdr = 'R-' . $nombre_cdr . '.zip';
 
         $code = (int)$cdr->getCode();
         $this->code = $code;
