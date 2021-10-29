@@ -350,7 +350,7 @@ function generar_resumen_diario($fecha, $codemp) {
         $documentos = $model->query($sql_detalle_resumen);
 
         while ($row = $documentos->fetch()) {
-            if($cpe->getCode() !== 0 ) {
+            if($cpe->getCode() === 0 ) {
 
                 if($row->dr_estado == "1") {
 
