@@ -70,8 +70,19 @@ function generar_comunicacion_baja($fecha, $codemp) {
         $cpe->enviar_sunat();
         if($cpe->getCode() !== 0) {
 
-            $mensaje = "Error en comunicacion de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
-            throw new Exception($mensaje);
+            $code = intval($cpe->getCodigoError());
+
+            if($code != 98 && $code != 99) {
+               
+
+                $mensaje = "Error en comunicacion de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
+                throw new Exception($mensaje);
+            } else {
+                $cpe->setCode($code);
+                $cpe->setObservaciones($cpe->getErrorDescripcion());
+            }
+
+           
         }
 
         $datos_update = array();
@@ -118,8 +129,12 @@ function generar_comunicacion_baja($fecha, $codemp) {
         // echo $model->NumRows();
         while ($row = $documentos->fetch()) {
             
-
-            $res = guardar_documento($row, $cpe, "La Factura número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja");
+            if($cpe->getCode() === 0 ) {
+                $res = guardar_documento($row, $cpe, "La Factura número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja");
+            } else {
+                $res = guardar_documento($row, $cpe, "");
+            }
+            
             $documento_id = $res->lastInsertId();
             if($res->errorCode() != '00000') {
                 $error = $res->errorInfo();
