@@ -80,9 +80,19 @@ function generar_resumen_diario($fecha, $codemp) {
         $cpe->resumen_diario($resumen, $detalle_resumen);
         $cpe->enviar_sunat();
         if($cpe->getCode() !== 0) {
-         
-            $mensaje = "Error en resumen de baja de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
-            throw new Exception($mensaje);
+
+            $code = intval($cpe->getCodigoError());
+
+            if($code != 98 && $code != 99) {
+               
+
+                $mensaje = "Error en resumen de baja de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
+                throw new Exception($mensaje);
+            } else {
+                $cpe->setCode($code);
+                $cpe->setObservaciones($cpe->getErrorDescripcion());
+            }
+
         }
         
         $datos_resumen_diario = array();
@@ -105,8 +115,13 @@ function generar_resumen_diario($fecha, $codemp) {
         $documentos = $model->query($sql_detalle_resumen);
         // echo $model->NumRows();
         while ($row = $documentos->fetch()) {
-        
-            $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja");
+            if($cpe->getCode() === 0 ) {
+                $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja");
+            } else {
+                $res = guardar_documento($row, $cpe, "");
+            }
+
+          
             
             $documento_id = $res->lastInsertId();
 
