@@ -108,13 +108,17 @@ class CPE {
         $see->setCertificate(file_get_contents(dirname(__DIR__).'/certificados/'.$empresa->certificado_digital));
         $see->setService($endpoint);
 
+
+        $this->clave_sol = $empresa->clave_sol;
+
         if($ws == "OSE") {
             // die($empresa->clave_sol);
             $see->setClaveSOL("", $empresa->usuario_sol, $empresa->clave_sol);
-           
+           $this->usuario_sol = $empresa->usuario_sol;
         } else {
 
             $see->setClaveSOL($empresa->ruc, $empresa->usuario_sol, $empresa->clave_sol);
+            $this->usuario_sol = $empresa->ruc.$empresa->usuario_sol;
         }
 
         
@@ -122,14 +126,12 @@ class CPE {
         $this->empresa_ruc = $empresa->ruc;
         $soap = new SoapClient("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
         // $soap->setService("https://e-factura.sunat.gob.pe/ol-it-wsconscpegem/billConsultService?wsdl");
+      
+       
         if($ws == "OSE") {
-            $this->usuario_sol = $usuario_sol;
-            $this->clave_sol = $clave_sol;
+          
             $soap->setCredentials($empresa->ruc.$usuario_sol, $clave_sol);
         } else {
-
-            $this->usuario_sol = $empresa->usuario_sol;
-            $this->clave_sol = $empresa->clave_sol;
 
             $soap->setCredentials($empresa->ruc.$empresa->usuario_sol, $empresa->clave_sol);
         }
@@ -647,17 +649,19 @@ class CPE {
         $this->limpiar_enviar();
         
         // URL del servicio.
-        $urlService = 'https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService';
+        $urlService = $this->endpoint;
         $soap = new SoapClient();
         $soap->setService($urlService);
-        $soap->setCredentials($this->empresa_ruc.$this->usuario_sol, $this->clave_sol);
+        $soap->setCredentials($this->usuario_sol, $this->clave_sol);
         $statusService = new ExtService();
         $statusService->setClient($soap);
-
+        // echo $this->empresa_ruc.$this->usuario_sol."\n";
+        // echo $this->clave_sol;
         $status = $statusService->getStatus($ticket);
 
         if (!$status->isSuccess()) {
             // Error en la conexion con el servicio de SUNAT
+            // echo "hola";
             var_dump($status);
             return;
         }

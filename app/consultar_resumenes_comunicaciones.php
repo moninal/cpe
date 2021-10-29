@@ -25,7 +25,7 @@ while($value = $resumenes->fetch()) {
         $sql_detalle = "SELECT * FROM cpe.detalle_resumen AS dr 
         INNER JOIN cpe.vista_documentos_electronicos AS v ON(dr.documento_id=v.documento_id)
         WHERE dr.rd_id={$value->rd_id}";
-        $detalle = $model->query($sql);
+        $detalle = $model->query($sql_detalle);
 
         while($row = $detalle->fetch()) {
             
@@ -78,7 +78,7 @@ while($value = $comunicaciones->fetch()) {
         $sql_detalle = "SELECT * FROM cpe.detalle_baja AS db 
         INNER JOIN cpe.vista_documentos_electronicos AS v ON(db.documento_id=v.documento_id)
         WHERE db.cb_id={$value->cb_id}";
-        $detalle = $model->query($sql);
+        $detalle = $model->query($sql_detalle);
 
         while($row = $detalle->fetch()) {
             
