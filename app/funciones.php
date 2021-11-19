@@ -385,8 +385,8 @@ function crear_pdf() {
     FROM cpe.vista_documentos_electronicos WHERE idmovimiento={$id} AND codemp={$codemp} AND codsuc={$codsuc} AND nroinscripcion={$nroinscripcion} AND codciclo={$codciclo} AND tabla='{$tabla}'")->fetch();
     // echo $model->Sql();
     $datos->ruc = $empresa->ruc;
-
-    if($datos->nroinscripcion == "0" || $datos->codtipodocumentoidentidad == 0) {
+    print_R($datos->codtipodocumentoidentidad); exit;
+    if($datos->nroinscripcion == "0" || $datos->codtipodocumentoidentidad == "0") {
         if($datos->codtipodocumento == "01") {
             $datos->nrodocumentoidentidad = substr($datos->nrodocumentoidentidad, -11, 11);
             $datos->codtipodocumentoidentidad = '6';
