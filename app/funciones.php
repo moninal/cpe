@@ -377,7 +377,7 @@ function crear_pdf() {
     CASE WHEN documento_nombre IS NULL OR documento_nombre = '' THEN '".$empresa->ruc."' || '-' || codsunat || '-' || serie || '-' || nrodocumentotri ELSE documento_nombre END AS documento_nombre,
     nroinscripcion,
     tdi_id AS codtipodocumentoidentidad,
-    CASE WHEN nroinscripcion=0 THEN nrodocumento::TEXT ELSE cliente_numero_documento::TEXT END AS nrodocumentoidentidad,
+    CASE WHEN nroinscripcion=0 OR tdi_id = 0 THEN nrodocumento::TEXT ELSE cliente_numero_documento::TEXT END AS nrodocumentoidentidad,
     codsunat AS codtipodocumento,
     serie,
     nrodocumentotri AS correlativo,

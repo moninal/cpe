@@ -49,7 +49,7 @@ function generar_comprobante($row) {
         $sql_cliente = "SELECT 
         vde.nroinscripcion,
         vde.tdi_id AS codtipodocumentoidentidad,
-        CASE WHEN vde.nroinscripcion=0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
+        CASE WHEN vde.nroinscripcion=0 OR tdi_id = 0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
         vde.razonsocial AS razon_social,
         CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS direccion,
         vde.documentofecha,
