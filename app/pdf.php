@@ -373,7 +373,7 @@
         <div style="height: 5px;"></div>
         <div id="total_letras">
             <div class="row enfasis">
-                <?php echo "SON: ".NumerosEnLetras::convertir($Total); ?>
+                <?php echo "SON: ".NumerosEnLetras::convertir(str_replace(",","",$Total)); ?>
             </div>
         </div>
         <div style="height: 5px;"></div>
