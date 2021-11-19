@@ -138,7 +138,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $mail->isHTML(true);
    
 
-        $Contenido = "Estimado Cliente : " . $comprobante->razonsocial . " adjunto se remite los archivos correspondientes a su comprobante de pago de electrónico.";
+        $Contenido = "Estimado Cliente : " . $comprobante->razonsocial . ", en el adjunto se remite los archivos correspondientes a su comprobante de pago electrónico.";
         $Contenido .= "<br> <br> Atentamente: " . $empresa->razonsocial;
 
         $mail->Body = $Contenido;
