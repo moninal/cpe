@@ -31,7 +31,7 @@ CASE
 WHEN cl.codtipodocumento = 1 THEN 1
 WHEN cl.codtipodocumento = 2 THEN 4
 WHEN cl.codtipodocumento = 3 THEN 6 
-ELSE -1 END AS tdi_id,
+ELSE 0 END AS tdi_id,
 CASE WHEN cl.nrodocumento IS NULL OR cl.nrodocumento = '' THEN '00000000' ELSE  cl.nrodocumento END AS cliente_numero_documento,
 'cobranza.cabpagos' AS tabla,
 m.codemp,
@@ -109,7 +109,7 @@ CASE
 WHEN cl.codtipodocumento = 1 THEN 1
 WHEN cl.codtipodocumento = 2 THEN 4
 WHEN cl.codtipodocumento = 3 THEN 6 
-ELSE -1 END AS tdi_id,
+ELSE 0 END AS tdi_id,
 CASE WHEN cl.nrodocumento IS NULL OR cl.nrodocumento = '' THEN '00000000' ELSE  cl.nrodocumento END AS cliente_numero_documento,
 'cobranza.cabprepagos' AS tabla,
 m.codemp,
