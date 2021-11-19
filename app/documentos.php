@@ -62,7 +62,7 @@ function generar_comprobante($row) {
         // die($sql_cliente);
         $cliente = $model->query($sql_cliente)->fetch();
 
-        if($cliente->nroinscripcion == "0" || $cliente->codtipodocumentoidentidad === 0) {
+        if($cliente->nroinscripcion == "0" || $cliente->codtipodocumentoidentidad == -1) {
             if($cliente->codsunat == "01") {
                 $cliente->nrodocumentoidentidad = substr($cliente->nrodocumentoidentidad, -11, 11);
                 $cliente->codtipodocumentoidentidad = '6';
