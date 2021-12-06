@@ -1,0 +1,8 @@
+credenciales sol principales:
+    RUC: 20115851919
+    user: CPCQZ2KB
+    pass: DSiSo3upK
+
+    usuario secundario:
+    user: FACTURAC
+    pass: Factura01

@@ -273,7 +273,7 @@ function generar_resumen_diario($fecha, $codemp) {
         vde.serie,
         vde.nrodocumentotri AS correlativo,
         CASE WHEN vde.estado = 1 THEN 'I' ELSE 'A' END estado,
-        CASE WHEN vde.estado = 1 THEN '3' ELSE '1' END dr_estado,
+        CASE WHEN vde.estado = 1 THEN '4' ELSE '1' END dr_estado,
         vde.tdi_id AS codtipodocumentoidentidad,
         vde.cliente_numero_documento AS nrodocumentoidentidad,
         vde.imptotal AS total,
