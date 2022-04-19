@@ -26,8 +26,8 @@ $response = array();
 // $pass_emisor = "fdfdlfjdlfj";
 // $port_emisor = "fdfdlfjdlfj";
 $host_email = "mail.emapica.com.pe";
-$email_emisor = "comprobanteelectronicos@emapica.com.pe";
-$pass_emisor = "Otic$2021";
+$email_emisor = "recibodigital@emapica.com.pe";
+$pass_emisor = "Otic$2022";
 $port_emisor = "465";
 
  
@@ -80,14 +80,14 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         //o sino la mejor opcion es con SMTPSecure='ssl' y el puerto 665
 
     
-        $mail->setFrom(utf8_decode($email_emisor), utf8_decode("fdfdlfjdlfj"));
+        $mail->setFrom(utf8_decode($email_emisor), utf8_decode("Recibo de Facturación"));
         $mail->addAddress($email, $nombrecliente);
         $mail->Subject = utf8_decode("RECIBO DE CONSUMO DE SERVICIO - EMAPICA");
         $mail->isHTML(true);
-   
 
-        $Contenido = "Estimado Cliente : " . $nombrecliente . ", en el adjunto se emite los recibos de su facturación por su consumo hasta la fecha.";
-        $Contenido .= "<br> <br> Atentamente: " . "fdfdlfjdlfj";
+
+        $Contenido = "Estimado Cliente : " . $nombrecliente . ", en el adjunto se remite el recibo de su facturación del mes.";
+        $Contenido .= "<br> <br> Atentamente: " . "EMAPICA S.A.";
 
         $mail->Body = $Contenido;   
             //$pdf->stream(nombre_documento() . ".pdf", array("Attachment" => false));
