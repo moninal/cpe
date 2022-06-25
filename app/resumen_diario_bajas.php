@@ -48,7 +48,7 @@ function generar_resumen_diario($fecha, $codemp) {
         LEFT JOIN cpe.detalle_resumen AS dr ON(dr.documento_id=vde.documento_id)
         LEFT JOIN cpe.resumenes_diarios AS rd ON(rd.rd_id=dr.rd_id)
         WHERE vde.codsunat='03' AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp} AND vde.estado=1 /*SOLO ANULADOS*/ 
-        AND CASE WHEN dr.documento_id IS NOT NULL THEN vde.estado_documento = 'A' AND vde.documento_estado<>'I' AND dr.dr_estado<>'3' ELSE dr.documento_id IS NULL END
+        AND CASE WHEN dr.documento_id IS NOT NULL THEN vde.estado_documento = 'A' AND vde.documento_estado<>'I' AND dr.dr_estado NOT IN('3','4') ELSE dr.documento_id IS NULL END
         ORDER BY vde.documentofecha ASC";
         
         $detalle_resumen = $model->query($sql_detalle_resumen)->fetchAll();

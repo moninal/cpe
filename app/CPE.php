@@ -367,6 +367,7 @@ class CPE {
                 ->setSerieNro($value->serie."-".$value->correlativo)
                 ->setEstado($value->dr_estado) // cat 19 1 -> adicionar, 2-> modificar, 3 -> anulado,
             //4 anulado en el dia antes de informar comprobante, transporte publico,
+            //18/04/2022 ya no hay codigo 4 en el nuevo catalogo: usar codigo 3 nomas
                 // 08/05/2021:
                 // 1: Se esta informando por primera vez.
                 // 2: Se informó previamente y se quiere editar sus valores.

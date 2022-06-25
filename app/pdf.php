@@ -13,7 +13,7 @@
         $Fecha =  $_REQUEST["Venta"]["venta_fecha"];
         //$Hora =  $_REQUEST["Venta"]["venta_hora"];
 
-        $Direccion =  (isset($_REQUEST["Venta"]["cliente_direccion"])) ? $_REQUEST["Venta"]["cliente_direccion"] : "";
+        $Direccion =  (isset($_REQUEST["Venta"]["cliente_direccion"])) ? utf8_decode($_REQUEST["Venta"]["cliente_direccion"]) : "";
 
         $Total =  number_format($_REQUEST["Venta"]["venta_total"],2);
         $valor_venta =  number_format($_REQUEST["Venta"]["valor_venta"],2);
@@ -373,7 +373,7 @@
         <div style="height: 5px;"></div>
         <div id="total_letras">
             <div class="row enfasis">
-                <?php echo "SON: ".NumerosEnLetras::convertir($Total); ?>
+                <?php echo "SON: ".NumerosEnLetras::convertir(str_replace(",","",$Total)); ?>
             </div>
         </div>
         <div style="height: 5px;"></div>

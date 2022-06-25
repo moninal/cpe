@@ -63,7 +63,7 @@ INNER JOIN reglasnegocio.documentos co ON ( M.coddocumento = co.coddocumento AND
 INNER JOIN ADMIN.sucursales suc ON ( suc.codemp = M.codemp AND M.codsuc = suc.codsuc ) 
 LEFT JOIN catastro.clientes AS cl ON(cl.codemp=m.codemp AND cl.codsuc=m.codsuc AND cl.nroinscripcion=m.nroinscripcion)
 LEFT JOIN cpe.documentos AS doc ON (doc.codemp=m.codemp AND doc.codsuc=m.codsuc AND doc.nrooperacion=m.nropago AND doc.codciclo=m.codciclo AND doc.nroinscripcion=m.nroinscripcion AND doc.tabla='cobranza.cabpagos')
-WHERE co.codsunat IS NOT NULL AND M.coddocumento IN ( 13, 14 )
+WHERE co.codsunat IS NOT NULL AND M.coddocumento IN ( 13, 14 ) AND m.nroprepago=0
 
 UNION ALL
 
@@ -148,7 +148,8 @@ LEFT JOIN cpe.documentos AS doc ON (doc.codemp=m.codemp AND doc.codsuc=m.codsuc 
 LEFT JOIN ( SELECT c2.serie, c2.nrodocumentotri, c2.codsuc, c2.codemp, c2.nroinscripcion, c2.codzona 
 FROM cobranza.cabpagos c2 
 WHERE c2.coddocumento IN ( 13, 14 ) ) AS ccab ON ( ccab.serie = md.serie AND ccab.nrodocumentotri = md.nrodocumento AND ccab.codsuc = M.codsuc AND ccab.codemp = M.codemp AND ccab.codzona = M.codzona AND ccab.nroinscripcion = M.nroinscripcion ) 
-WHERE co.codsunat IS NOT NULL AND ccab.nrodocumentotri IS NULL AND md.coddocumento IN ( 13, 14 ) 
+WHERE co.codsunat IS NOT NULL /*AND ccab.nrodocumentotri IS NULL*/ AND md.coddocumento IN ( 13, 14 ) 
+/*AND m.nroprepago IN( SELECT nroprepago FROM cobranza.cabpagos)*/
 GROUP BY
 M.nroprepago,
 M.fechareg,

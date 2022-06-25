@@ -49,7 +49,7 @@ function generar_comprobante($row) {
         $sql_cliente = "SELECT 
         vde.nroinscripcion,
         vde.tdi_id AS codtipodocumentoidentidad,
-        CASE WHEN vde.nroinscripcion=0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
+        CASE WHEN vde.nroinscripcion=0 OR tdi_id = 0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
         vde.razonsocial AS razon_social,
         CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS direccion,
         vde.documentofecha,
@@ -62,7 +62,7 @@ function generar_comprobante($row) {
         // die($sql_cliente);
         $cliente = $model->query($sql_cliente)->fetch();
 
-        if($cliente->nroinscripcion == "0") {
+        if($cliente->nroinscripcion == "0" || $cliente->codtipodocumentoidentidad == "0") {
             if($cliente->codsunat == "01") {
                 $cliente->nrodocumentoidentidad = substr($cliente->nrodocumentoidentidad, -11, 11);
                 $cliente->codtipodocumentoidentidad = '6';
@@ -267,7 +267,7 @@ function generar_resumen_diario($fecha, $codemp) {
         $resumen["fecha_generacion"] = $fecha;
         $resumen["correlativo"] = (string)$correlativo;
         $resumen = (object)$resumen;
-            
+        //18/04/2022 ya no hay codigo 4 en el nuevo catalogo: usar codigo 3 nomas, para el dr_estado
         $sql_detalle_resumen = "SELECT 
         vde.codsunat AS codtipodocumento,
         vde.serie,
@@ -311,7 +311,7 @@ function generar_resumen_diario($fecha, $codemp) {
                 }
             } 
         }
-
+        // print_r($detalle_resumen);
         $cpe->resumen_diario($resumen, $detalle_resumen);
         // print_r($cpe); exit;
         $cpe->enviar_sunat();

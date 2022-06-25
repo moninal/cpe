@@ -377,7 +377,7 @@ function crear_pdf() {
     CASE WHEN documento_nombre IS NULL OR documento_nombre = '' THEN '".$empresa->ruc."' || '-' || codsunat || '-' || serie || '-' || nrodocumentotri ELSE documento_nombre END AS documento_nombre,
     nroinscripcion,
     tdi_id AS codtipodocumentoidentidad,
-    CASE WHEN nroinscripcion=0 THEN nrodocumento::TEXT ELSE cliente_numero_documento::TEXT END AS nrodocumentoidentidad,
+    CASE WHEN nroinscripcion=0 OR tdi_id = 0 THEN nrodocumento::TEXT ELSE cliente_numero_documento::TEXT END AS nrodocumentoidentidad,
     codsunat AS codtipodocumento,
     serie,
     nrodocumentotri AS correlativo,
@@ -385,8 +385,8 @@ function crear_pdf() {
     FROM cpe.vista_documentos_electronicos WHERE idmovimiento={$id} AND codemp={$codemp} AND codsuc={$codsuc} AND nroinscripcion={$nroinscripcion} AND codciclo={$codciclo} AND tabla='{$tabla}'")->fetch();
     // echo $model->Sql();
     $datos->ruc = $empresa->ruc;
-
-    if($datos->nroinscripcion == "0") {
+    // print_R($datos->codtipodocumentoidentidad); exit;
+    if($datos->nroinscripcion == "0" || $datos->codtipodocumentoidentidad == "0") {
         if($datos->codtipodocumento == "01") {
             $datos->nrodocumentoidentidad = substr($datos->nrodocumentoidentidad, -11, 11);
             $datos->codtipodocumentoidentidad = '6';
