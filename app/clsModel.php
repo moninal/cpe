@@ -73,7 +73,7 @@ class ClsModel {
             $array = explode(".", $tabla);
             $schema = $array[0];
             $table = $array[1];
-
+            
             $sql = "SELECT cols.column_name, cols.data_type
             FROM information_schema.columns cols
             where cols.table_name= '{$table}' and cols.table_schema='{$schema}'";
