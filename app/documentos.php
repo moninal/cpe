@@ -275,7 +275,8 @@ function generar_resumen_diario($fecha, $codemp) {
         CASE WHEN vde.estado = 1 THEN 'I' ELSE 'A' END estado,
         CASE WHEN vde.estado = 1 THEN '3' ELSE '1' END dr_estado,
         vde.tdi_id AS codtipodocumentoidentidad,
-        vde.cliente_numero_documento AS nrodocumentoidentidad,
+        CASE WHEN vde.nroinscripcion=0 OR tdi_id = 0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
+        /*vde.cliente_numero_documento AS nrodocumentoidentidad,*/
         vde.imptotal AS total,
         vde.subtotal AS valor_venta,
         vde.igv,
@@ -300,8 +301,8 @@ function generar_resumen_diario($fecha, $codemp) {
         // print_r($resumen); exit;
         
         foreach ($detalle_resumen as $key => $value) {
-            if($value->nroinscripcion == "0") {
-                $nrodocumento = substr($value->nrodocumento, -8, 8);
+            // if($value->nroinscripcion == "0") {
+                $nrodocumento = substr($value->nrodocumentoidentidad, -8, 8);
                 if(is_numeric($nrodocumento)) {
                     $detalle_resumen[$key]->nrodocumentoidentidad = $nrodocumento;
                     $detalle_resumen[$key]->codtipodocumentoidentidad = "1";
@@ -309,7 +310,7 @@ function generar_resumen_diario($fecha, $codemp) {
                     $detalle_resumen[$key]->nrodocumentoidentidad = "00000000";
                     $detalle_resumen[$key]->codtipodocumentoidentidad = "0";
                 }
-            } 
+            // } 
         }
         // print_r($detalle_resumen);
         $cpe->resumen_diario($resumen, $detalle_resumen);
