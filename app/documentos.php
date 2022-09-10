@@ -172,8 +172,13 @@ function generar_comprobante($row) {
         // die($sql_detalle_comprobante);
         $detalle_comprobante = $model->query($sql_detalle_comprobante)->fetchAll();
 
+        if(count($detalle_comprobante) <= 0) {
+            $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: no tiene detalle";
+            throw new Exception($mensaje);
+        }
 
         $cpe->comprobante($comprobante, $detalle_comprobante);
+        
         // print_R($cpe); exit;
         if($comprobante->codtipodocumento == "01") {
             $cpe->enviar_sunat();
