@@ -250,6 +250,244 @@ function generar_comprobante($row) {
 }
 
 
+function generar_notas($row) {
+    global $model, $cpe; 
+    $response = array();
+
+    try {
+        //$model->getPDO()->beginTransaction();
+   
+        
+        $tabla          = $row->tabla;
+        $codemp         = $row->codemp;
+        $codsuc         = $row->codsuc;
+        $nroinscripcion = $row->nroinscripcion;
+        $codciclo       = $row->codciclo;
+        $id             = $row->idmovimiento;
+
+        $join = "";
+
+        $join = " INNER JOIN facturacion.detrebajas AS d ON(d.codemp=vde.codemp AND d.codsuc=vde.codsuc /*AND d.nroinscripcion=vde.nroinscripcion*/ AND d.nrorebaja=vde.idmovimiento)
+        INNER JOIN facturacion.conceptos AS c ON(c.codemp=d.codemp AND c.codsuc=d.codsuc AND c.codconcepto=d.codconcepto) ";
+
+      
+
+        $sql_igv = "SELECT * FROM reglasnegocio.parame WHERE tippar = 'IMPIGV' AND codsuc = {$codsuc}";
+       
+        $igv = $model->query($sql_igv)->fetch();
+        // print_r($igv);
+        if($igv->valor > 0) {
+            $igv_status = "S";
+            $codtipoigv = "10";
+        } else {
+            $igv_status = "N";
+            $codtipoigv = "20";
+        }
+
+        $sql_cliente = "SELECT 
+        vde.nroinscripcion,
+        vde.tdi_id AS codtipodocumentoidentidad,
+        CASE WHEN vde.nroinscripcion=0 OR tdi_id = 0 THEN vde.nrodocumento ELSE vde.cliente_numero_documento END AS nrodocumentoidentidad,
+        vde.razonsocial AS razon_social,
+        CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS direccion,
+        vde.documentofecha,
+        vde.serie || '-' || vde.nrodocumentotri AS comprobante,
+        vde.codsunat
+
+        FROM cpe.vista_documentos_electronicos AS vde
+        WHERE vde.codsunat='07' AND vde.coddocumento='14' AND vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} /*AND vde.codciclo={$codciclo}*/ AND vde.idmovimiento={$id}";
+   
+        // die($sql_cliente);
+        $cliente = $model->query($sql_cliente)->fetch();
+
+        if($cliente->nroinscripcion == "0" || $cliente->codtipodocumentoidentidad == "0") {
+            // if($cliente->codsunat == "01") {
+                $cliente->nrodocumentoidentidad = substr($cliente->nrodocumentoidentidad, -11, 11);
+                $cliente->codtipodocumentoidentidad = '6';
+               
+            // } else {
+            //     $cliente->nrodocumentoidentidad  = substr($cliente->nrodocumentoidentidad, -8, 8);
+            //     $cliente->codtipodocumentoidentidad = '1';
+
+            //     if(!is_numeric($cliente->nrodocumentoidentidad) || strlen($cliente->nrodocumentoidentidad) != 8) {
+            //         $cliente->nrodocumentoidentidad = '00000000';
+            //         $cliente->codtipodocumentoidentidad = '0';
+            //     }
+            // }
+            
+        }
+
+        if($cliente->codtipodocumentoidentidad == "6" && (!is_numeric($cliente->nrodocumentoidentidad) || strlen($cliente->nrodocumentoidentidad) != 11)) {
+            $mensaje = "RUC INVÁLIDO de la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante;
+            throw new Exception($mensaje);
+        }
+
+        if($cliente->codtipodocumentoidentidad == "1" && (!is_numeric($cliente->nrodocumentoidentidad) || strlen($cliente->nrodocumentoidentidad) != 8)) {
+            $mensaje = "DNI INVÁLIDO de la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante;
+            throw new Exception($mensaje);
+        }
+    
+        // print_r($cliente); exit;
+        $cpe->setCliente($cliente);
+        
+
+        $sql_comprobante = "SELECT 
+        vde.codsunat AS codtipodocumento,
+        vde.serie,
+        vde.nrodocumentotri AS correlativo,
+        vde.imptotal AS total,
+        vde.subtotal AS valor_venta,
+        vde.igv,
+        vde.documentofecha AS fecha,
+        'PEN' AS codmoneda,
+        vde.redondeo * -1 AS redondeo,
+        (vde.subtotal + vde.igv) AS subtotal,
+    
+        vde.igv AS total_impuestos,
+        /*'".$igv_status."' AS igv_status,*/
+        CASE WHEN vde.igv > 0 THEN 'S' ELSE 'N' END AS igv_status,
+        ".$igv->valor." AS porcentaje_igv,
+        'N' AS icbper_status,
+        
+        CASE WHEN vde.estado = 1 AND vde.codsunat='03' THEN 'I' ELSE 'A' END estado,
+		vde.coddocumento,
+        vde.idmovimiento
+        FROM cpe.vista_documentos_electronicos AS vde
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} /*AND vde.codciclo={$codciclo}*/ AND vde.idmovimiento={$id}";
+        // die($sql_comprobante);
+
+        $comprobante = $model->query($sql_comprobante)->fetch();
+        // echo $comprobante->serie;
+        // var_dump(strpos($comprobante->serie, "F"));
+        // exit;
+        if($comprobante->codtipodocumento == '07' && $comprobante->coddocumento == "14") {
+            // $comprobante->serie[0] = "F";
+            // var_dump(strpos($comprobante->serie, "F"));
+            // exit;
+            if(strpos($comprobante->serie, "F") === false) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: La serie debe ser del siguiente formato FNXX";
+                throw new Exception($mensaje);
+            }
+
+            if($cliente->codtipodocumentoidentidad != 6) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: el tipo de documento de identidad del cliente debe ser RUC porque el comprobante es una factura";
+                throw new Exception($mensaje);
+            }
+            
+            
+
+        }
+
+        if($comprobante->codtipodocumento == '03') {
+            // $comprobante->serie[0] = "B";
+            if(strpos($comprobante->serie, "B") === false) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: La serie debe ser del siguiente formato BXXX";
+                throw new Exception($mensaje);
+            }
+          
+            
+
+        }
+
+        // print_r($comprobante); exit;
+
+        $sql_detalle_comprobante = "SELECT 
+        d.codconcepto AS codproducto,
+        'ZZ' AS codunidad, /* codunidad para servicios*/
+        c.descripcion AS producto,
+        1 AS cantidad,
+        d.imprebajado AS valor_unitario,
+        d.imprebajado AS valor_venta,
+        d.imprebajado * $igv->valor / 100 AS igv,
+        /*".$codtipoigv." AS codtipoigv,*/
+        CASE WHEN c.afecto_igv = 1 THEN '10' ELSE '20' END AS codtipoigv,
+        d.imprebajado * $igv->valor / 100 AS total_impuestos,
+        d.imprebajado + (d.imprebajado * $igv->valor / 100) AS precio_unitario
+        FROM cpe.vista_documentos_electronicos AS vde
+        ".$join."
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} /*AND vde.codciclo={$codciclo}*/ AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
+        // die($sql_detalle_comprobante);
+        $detalle_comprobante = $model->query($sql_detalle_comprobante)->fetchAll();
+
+
+        // $cpe->comprobante($comprobante, $detalle_comprobante);
+        $cpe->nota($comprobante, $detalle_comprobante);
+        // print_R($cpe); exit;
+        // if($comprobante->codtipodocumento == "01") {
+		if($comprobante->codtipodocumento == '07' && $comprobante->coddocumento == "14") {
+            $cpe->enviar_sunat();
+            // exit;
+            // print_r($cpe->getCode()); exit;
+            $cdr_response = $cpe->getCdrResponse();
+            if($cpe->getCode() !== 0) {
+                $mensaje = "Error en la fecha: ".$cliente->documentofecha." del comprobante: ".$cliente->comprobante." error: ".$cpe->getCodigoError().": ".$cpe->getErrorDescripcion();
+                throw new Exception($mensaje);
+            }
+
+       
+            $row->estado = $comprobante->estado;
+            $res = guardar_documento($row, $cpe, $cdr_response);
+    
+            if($res->errorCode() != '00000') {
+                $error = $res->errorInfo();
+                $mensaje = "Error al insertar documento: ".$error[2];
+                throw new Exception($mensaje);
+            }
+
+            //ACTUALIZAMOS LA RESPECTIVA TABLA DE PAGO, SI EL COMPORBANTE FUE ACEPTADO
+            // if($cpe->getCode() === 0) {
+            
+                // $res = actualizar_pago($row);
+                // // print_r($res->errorCode()); exit;
+                // if($res->errorCode() != '00000') {
+                //     $error = $res->errorInfo();
+                 
+                //     $mensaje = "Error al modificar: ".$tabla." error: ".$error[2];
+                //     throw new Exception($mensaje);
+                // }
+            // }
+        } else {
+            $update_documento = array();
+            $update_documento[":documento_nombre"] = $cpe->getNombreDocumento();
+            $update_documento[":documento_nombre_xml"] = $cpe->getNombreXml();
+            $update_documento[":documento_nombre_cdr"] = $cpe->getNombreCdr();
+            
+            $where_documento = array();
+            $where_documento[":codemp"] = $row->codemp;
+            $where_documento[":codsuc"] = $row->codsuc;
+            $where_documento[":nrooperacion"] = $row->idmovimiento;
+            $where_documento[":nroinscripcion"] = $row->nroinscripcion;
+            $where_documento[":codciclo"] = $row->codciclo;
+            $model->modificar("cpe.documentos", $update_documento, $where_documento);
+
+            if($model->errorCode() != '00000') {
+                $error = $model->errorInfo();
+                $mensaje = "Error al modificar documento: ".$error[2];
+                throw new Exception($mensaje);
+            }
+
+        }
+       
+
+
+        $response["res"] = 1;
+        // $response["cpe"] = $cpe;
+        //$model->getPDO()->commit();
+        // $model->liberar();  
+        return $response;
+        //echo json_encode($response);
+    } catch (Exception $e) {
+        //$model->getPDO()->rollBack();
+        $response["res"]     = 2;
+        $response["mensaje"] = $e->getMessage();
+        // echo json_encode($response);
+
+        return $response;
+
+    }
+
+}
+
 function generar_resumen_diario($fecha, $codemp) {
     global $model, $cpe; 
     
@@ -288,17 +526,18 @@ function generar_resumen_diario($fecha, $codemp) {
         vde.tabla,
         vde.nrodocumento,
         vde.direccion,
+        vde.coddocumento,
        /*CASE WHEN p.valor::FLOAT > 0 THEN 'S' ELSE 'N' END AS  igv_status*/
         CASE WHEN vde.igv > 0 THEN 'S' ELSE 'N' END AS  igv_status
         FROM cpe.vista_documentos_electronicos AS vde
         LEFT JOIN reglasnegocio.parame AS p ON(p.codsuc=vde.codsuc AND p.tippar = 'IMPIGV')
-        WHERE vde.codsunat='03'  AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp}
+        WHERE (vde.codsunat='03' OR (vde.codsunat='07' AND vde.coddocumento='13')) AND vde.documentofecha='" . $fecha . "' AND vde.codemp={$codemp}
         ORDER BY vde.documentofecha ASC";
         // die($sql_detalle_resumen);
         $detalle_resumen = $model->query($sql_detalle_resumen)->fetchAll();
         //   echo "<pre>";
 
-        // print_r($resumen); exit;
+        // print_r($detalle_resumen); exit;
         
         foreach ($detalle_resumen as $key => $value) {
             // if($value->nroinscripcion == "0") {
@@ -518,7 +757,7 @@ $contador = 1;
 while($fechaCursor <= $fhasta) {
     // echo $fechaCursor."<br>";
     // RESUMEN DIARIO
-    $sql_boletas = "SELECT codemp FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='03'
+    $sql_boletas = "SELECT codemp FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND (codsunat='03' OR(codsunat='07' AND coddocumento='14'))
     GROUP BY codemp
     ORDER BY codemp ASC";
     // die($sql_boletas);
@@ -534,13 +773,13 @@ while($fechaCursor <= $fhasta) {
             $model->query("SELECT * FROM cpe.resumenes_diarios WHERE rd_fecha_generacion='".$fechaCursor."' AND codemp={$row->codemp} AND rd_tipo='RN' AND rd_code IN(0, 98, 99)");
             // var_dump($model->NumRows()); exit;
             if($model->NumRows() <= 0) {
-                $response = validar_resumen_diario($fechaCursor, $row->codemp);
+                // $response = validar_resumen_diario($fechaCursor, $row->codemp);
                
-                if($response["res"] == 2) {
-                    // throw new Exception($response["mensaje"]);
-                    $mensajes .= $response["mensaje"]."\n";
-                    continue;
-                }
+                // if($response["res"] == 2) {
+                //     // throw new Exception($response["mensaje"]);
+                //     $mensajes .= $response["mensaje"]."\n";
+                //     continue;
+                // }
 
                 try {
                     $model->getPDO()->beginTransaction();
@@ -590,6 +829,57 @@ while($fechaCursor <= $fhasta) {
                        
 
                         $response = generar_comprobante($factura);
+                        // print_r($response); exit;
+                        if($response["res"] == 2) {
+                            throw new Exception($response["mensaje"]);
+                        
+                        }
+                        $model->getPDO()->commit();
+                    } catch(Exception $e) {
+                        $model->getPDO()->rollBack();
+                        $mensajes .= $contador.") ".$e->getMessage()."\n";
+                        $contador = $contador + 1;
+                    }
+
+                   
+
+                 
+                }
+                
+            }
+            
+            
+
+
+        }
+
+    }
+
+
+    // NOTAS DE CREDITO DE FACTURAS
+    $sql_notas = "SELECT codemp FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='07' AND coddocumento='14'
+    GROUP BY codemp
+    ORDER BY codemp ASC";
+    $model->query($sql_notas);
+
+    if($model->NumRows() > 0) {
+        $notas = $model->query($sql_notas);
+        while($row = $notas->fetch()) {
+            
+            $sql_notas = "SELECT * FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND codsunat='07' AND coddocumento='14' AND codemp={$row->codemp} AND estado_cpe='PENDIENTE'";
+            // echo $sql_notas;
+            // die($sql_notas);
+            $model->query($sql_notas);
+
+            if($model->NumRows() > 0) {
+                $notas = $model->query($sql_notas);
+
+                while($nota = $notas->fetch()) {
+                    try {
+                        $model->getPDO()->beginTransaction();
+                       
+
+                        $response = generar_notas($nota);
                         // print_r($response); exit;
                         if($response["res"] == 2) {
                             throw new Exception($response["mensaje"]);

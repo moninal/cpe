@@ -417,6 +417,11 @@ function crear_pdf() {
         INNER JOIN facturacion.conceptos AS c ON(c.codemp=d.codemp AND c.codsuc=d.codsuc AND c.codconcepto=d.codconcepto) ";
     }
 
+    if($tabla == "facturacion.cabrebajas") {
+        $join = " INNER JOIN facturacion.detrebajas AS d ON(d.codemp=vde.codemp AND d.codsuc=vde.codsuc /*AND d.nroinscripcion=vde.nroinscripcion*/ AND d.nrorebaja=vde.idmovimiento)
+        INNER JOIN facturacion.conceptos AS c ON(c.codemp=d.codemp AND c.codsuc=d.codsuc AND c.codconcepto=d.codconcepto) ";
+    }
+
     $sql_igv = "SELECT * FROM reglasnegocio.parame WHERE tippar = 'IMPIGV' AND codsuc = {$codsuc}";
     $igv = $model->query($sql_igv)->fetch();
     if($igv->valor > 0) {
@@ -427,58 +432,124 @@ function crear_pdf() {
         $codtipoigv = "20";
     }
 
-    $sql_comprobante = "SELECT 
-    CASE WHEN vde.codsunat = '01' THEN 'FACTURA' ELSE 'BOLETA DE VENTA' END AS tipodoc_descripcion,
-    vde.serie AS venta_serie,
-    (vde.serie || '-' || vde.nrodocumentotri) AS venta_documento,
-    vde.razonsocial AS cliente_nombres,
-    to_char(vde.documentofecha, 'DD/MM/YYYY') AS venta_fecha,
-    vde.imptotal AS venta_total,
-    vde.subtotal AS valor_venta,
-    vde.redondeo,
-    ".$igv->valor." AS porcentaje_igv,
-    CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS cliente_direccion,
-    'PEN' AS moneda_descripcion,
-  
-    'CONTADO' AS fp_descripcion,
-    '".$igv_status."' AS igv_status,
-    (vde.subtotal + vde.igv) AS subtotal,
-    vde.igv
-    FROM cpe.vista_documentos_electronicos AS vde
-    WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
-    //die($sql_comprobante);
+    if($tabla == "facturacion.cabrebajas") {
+        $sql_comprobante = "SELECT 
+        CASE WHEN vde.codsunat = '01' THEN 'FACTURA' WHEN vde.codsunat = '07' THEN 'NOTA DE CRÉDITO' ELSE 'BOLETA DE VENTA' END AS tipodoc_descripcion,
+        vde.serie AS nota_serie,
+        (vde.serie || '-' || vde.nrodocumentotri) AS nota_documento,
+        vde.razonsocial AS cliente_nombres,
+        to_char(vde.documentofecha, 'DD/MM/YYYY') AS nota_fecha,
+        vde.imptotal AS nota_total,
+        vde.subtotal AS valor_venta,
+        vde.redondeo,
+        ".$igv->valor." AS porcentaje_igv,
+        CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS cliente_direccion,
+        'PEN' AS moneda_descripcion,
+      
+        'CONTADO' AS fp_descripcion,
+        '".$igv_status."' AS igv_status,
+        (vde.subtotal + vde.igv) AS subtotal,
+        vde.igv
+        FROM cpe.vista_documentos_electronicos AS vde
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} /*AND vde.codciclo={$codciclo}*/ AND vde.idmovimiento={$id}";
+
+       
+        //die($sql_comprobante);
+    } else {
+        $sql_comprobante = "SELECT 
+        CASE WHEN vde.codsunat = '01' THEN 'FACTURA' ELSE 'BOLETA DE VENTA' END AS tipodoc_descripcion,
+        vde.serie AS venta_serie,
+        (vde.serie || '-' || vde.nrodocumentotri) AS venta_documento,
+        vde.razonsocial AS cliente_nombres,
+        to_char(vde.documentofecha, 'DD/MM/YYYY') AS venta_fecha,
+        vde.imptotal AS venta_total,
+        vde.subtotal AS valor_venta,
+        vde.redondeo,
+        ".$igv->valor." AS porcentaje_igv,
+        CASE WHEN vde.nroinscripcion=0 THEN  vde.direccion ELSE vde.direcciondistribucion END AS cliente_direccion,
+        'PEN' AS moneda_descripcion,
+      
+        'CONTADO' AS fp_descripcion,
+        '".$igv_status."' AS igv_status,
+        (vde.subtotal + vde.igv) AS subtotal,
+        vde.igv
+        FROM cpe.vista_documentos_electronicos AS vde
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
+        //die($sql_comprobante);
+    }
+   
 
     $comprobante = $model->query($sql_comprobante)->fetch();
     $comprobante->cliente_numero_documento =  $datos->nrodocumentoidentidad;
     // echo "<pre>";
     // print_r($comprobante); exit;
-    $sql_detalle_comprobante = "SELECT 
-    d.codconcepto AS codproducto,
-    'ZZ' AS codunidad, /* codunidad para servicios*/
-    c.descripcion AS producto,
-    1 AS cantidad,
-    d.importe AS valor_unitario,
-    d.importe AS valor_venta,
-    d.importe * $igv->valor / 100 AS igv,
-    ".$codtipoigv." AS codtipoigv,
-    d.importe * $igv->valor / 100 AS total_impuestos,
-    d.importe + (d.importe * $igv->valor / 100) AS precio_unitario
-    FROM cpe.vista_documentos_electronicos AS vde
-    ".$join."
-    WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
-    //die($sql_detalle_comprobante);
+    if($tabla == "facturacion.cabrebajas") {
+        $sql_detalle_comprobante = "SELECT 
+        d.codconcepto AS codproducto,
+        'ZZ' AS codunidad, /* codunidad para servicios*/
+        c.descripcion AS producto,
+        1 AS cantidad,
+        d.imprebajado AS valor_unitario,
+        d.imprebajado AS valor_venta,
+        d.imprebajado * $igv->valor / 100 AS igv,
+        ".$codtipoigv." AS codtipoigv,
+        d.imprebajado * $igv->valor / 100 AS total_impuestos,
+        d.imprebajado + (d.imprebajado * $igv->valor / 100) AS precio_unitario
+        FROM cpe.vista_documentos_electronicos AS vde
+        ".$join."
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} /*AND vde.codciclo={$codciclo}*/ AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
+        //die($sql_detalle_comprobante);
+    } else {
+        $sql_detalle_comprobante = "SELECT 
+        d.codconcepto AS codproducto,
+        'ZZ' AS codunidad, /* codunidad para servicios*/
+        c.descripcion AS producto,
+        1 AS cantidad,
+        d.importe AS valor_unitario,
+        d.importe AS valor_venta,
+        d.importe * $igv->valor / 100 AS igv,
+        ".$codtipoigv." AS codtipoigv,
+        d.importe * $igv->valor / 100 AS total_impuestos,
+        d.importe + (d.importe * $igv->valor / 100) AS precio_unitario
+        FROM cpe.vista_documentos_electronicos AS vde
+        ".$join."
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
+    }
+   
     $detalle_comprobante = $model->query($sql_detalle_comprobante)->fetchAll();
+
+    
 
     $data = array();
     // print_r($empresa); exit;
     $data["Empresa"] = $empresa;
-    $data["Venta"] = $comprobante;
+  
+    if($tabla == "facturacion.cabrebajas") {
+
+        $sql_referencia = "SELECT ((seriedocumento::text) || '-'::text) || 
+		btrim(to_char(nrodocumento, '00000000'::text)) AS nota_documento_referencia FROM facturacion.detrebajas WHERE codemp={$codemp} AND codsuc={$codsuc} AND nrorebaja={$id}";
+		$referencia = $model->query($sql_referencia)->fetch();
+
+        $data["Nota"] = $comprobante;
+        $data["Nota"]->nota_documento_referencia = $referencia->nota_documento_referencia;
+        $data["Nota"]->motivo_descripcion = 'ANULACION DE LA OPERACION';
+        $data["Nota"]->nota_observacion = 'ANULACION DE LA OPERACION';
+        $data["DetalleNota"] = $detalle_comprobante;
+        
+    } else {
+        $data["Venta"] = $comprobante;
+        $data["DetalleVenta"] = $detalle_comprobante;
+    }
+   
     $data["tipodoc_id"] = $datos->codtipodocumento;
-    $data["DetalleVenta"] = $detalle_comprobante;
+  
     $data["nombre_documento"] = $datos->documento_nombre;
+    
    
     $URL = "http://localhost:9000/cpe/app/pdf.php";
     //Indicamos que utilizamos el protocolo http, método post, cabecera de formulario, y los parámetros de la consulta.
+    // echo "<pre>";
+    // print_R($data); exit;
     $opciones = array('http' => array(
         'method'  => 'POST',
         'header'  => 'Content-type: application/x-www-form-urlencoded',
@@ -490,7 +561,7 @@ function crear_pdf() {
 
     //Solicitar el contenido
     $respuesta = file_get_contents($URL, false, $contexto);
-   // print_r($respuesta); exit;
+    // print_r($respuesta); exit;
     //Imprimimos la respuesta del servidor
 
     $pdf = new DOMPDF();
