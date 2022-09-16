@@ -778,13 +778,13 @@ while($fechaCursor <= $fhasta) {
             $model->query("SELECT * FROM cpe.resumenes_diarios WHERE rd_fecha_generacion='".$fechaCursor."' AND codemp={$row->codemp} AND rd_tipo='RN' AND rd_code IN(0, 98, 99)");
             // var_dump($model->NumRows()); exit;
             if($model->NumRows() <= 0) {
-                // $response = validar_resumen_diario($fechaCursor, $row->codemp);
+                $response = validar_resumen_diario($fechaCursor, $row->codemp);
                
-                // if($response["res"] == 2) {
-                //     // throw new Exception($response["mensaje"]);
-                //     $mensajes .= $response["mensaje"]."\n";
-                //     continue;
-                // }
+                if($response["res"] == 2) {
+                    // throw new Exception($response["mensaje"]);
+                    $mensajes .= $response["mensaje"]."\n";
+                    continue;
+                }
 
                 try {
                     $model->getPDO()->beginTransaction();
