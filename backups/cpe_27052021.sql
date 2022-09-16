@@ -408,7 +408,10 @@ btrim(to_char(d.nrodocumentoabono, '00000000'::text)) as doc_sun,
 	end as razonsocial,
 	ROUND(SUM(d.imprebajado)) as total,
 	er.descripcion as condicion,
-	c.codestrebaja as estado,
+	case
+		when c.codestrebaja = 0 then 1
+		else 0
+	end as estado,
 	d.coddocumento as coddocumento,
 	d.seriedocumentoabono as serie,
 	btrim(to_char(d.nrodocumentoabono, '00000000'::text)) as nrodocumentotri,
