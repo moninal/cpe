@@ -33,7 +33,14 @@ function generar_comprobante($row) {
             $join = " INNER JOIN cobranza.detprepagos AS d ON(d.codemp=vde.codemp AND d.codsuc=vde.codsuc AND d.nroinscripcion=vde.nroinscripcion AND d.nroprepago=vde.idmovimiento)
             INNER JOIN facturacion.conceptos AS c ON(c.codemp=d.codemp AND c.codsuc=d.codsuc AND c.codconcepto=d.codconcepto) ";
         }
-
+        $where_ciclo = "";
+        if($tabla == "facturacion.cabrebajas") {
+            $join = " INNER JOIN facturacion.detrebajas AS d ON(d.codemp=vde.codemp AND d.codsuc=vde.codsuc /*AND d.nroinscripcion=vde.nroinscripcion*/ AND d.nrorebaja=vde.idmovimiento)
+            INNER JOIN facturacion.conceptos AS c ON(c.codemp=d.codemp AND c.codsuc=d.codsuc AND c.codconcepto=d.codconcepto) ";
+        } else {
+            $where_ciclo = "  AND vde.codciclo={$codciclo} ";
+        }
+        
         $sql_igv = "SELECT * FROM reglasnegocio.parame WHERE tippar = 'IMPIGV' AND codsuc = {$codsuc}";
        
         $igv = $model->query($sql_igv)->fetch();
@@ -57,7 +64,7 @@ function generar_comprobante($row) {
         vde.codsunat
 
         FROM cpe.vista_documentos_electronicos AS vde
-        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} {$where_ciclo} AND vde.idmovimiento={$id}";
    
         // die($sql_cliente);
         $cliente = $model->query($sql_cliente)->fetch();
@@ -116,7 +123,7 @@ function generar_comprobante($row) {
         
         CASE WHEN vde.estado = 1 AND vde.codsunat='03' THEN 'I' ELSE 'A' END estado
         FROM cpe.vista_documentos_electronicos AS vde
-        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id}";
+        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} {$where_ciclo} AND vde.idmovimiento={$id}";
         // die($sql_comprobante);
 
         $comprobante = $model->query($sql_comprobante)->fetch();
@@ -153,23 +160,42 @@ function generar_comprobante($row) {
         }
 
         // print_r($comprobante); exit;
-
-        $sql_detalle_comprobante = "SELECT 
-        d.codconcepto AS codproducto,
-        'ZZ' AS codunidad, /* codunidad para servicios*/
-        c.descripcion AS producto,
-        1 AS cantidad,
-        d.importe AS valor_unitario,
-        d.importe AS valor_venta,
-        d.importe * $igv->valor / 100 AS igv,
-        /*".$codtipoigv." AS codtipoigv,*/
-        CASE WHEN c.afecto_igv = 1 THEN '10' ELSE '20' END AS codtipoigv,
-        d.importe * $igv->valor / 100 AS total_impuestos,
-        d.importe + (d.importe * $igv->valor / 100) AS precio_unitario
-        FROM cpe.vista_documentos_electronicos AS vde
-        ".$join."
-        WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} AND vde.codciclo={$codciclo} AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
-        // die($sql_detalle_comprobante);
+        if($tabla == "facturacion.cabrebajas") {
+            $sql_detalle_comprobante = "SELECT 
+            d.codconcepto AS codproducto,
+            'ZZ' AS codunidad, /* codunidad para servicios*/
+            c.descripcion AS producto,
+            1 AS cantidad,
+          
+            d.imprebajado AS valor_unitario,
+            d.imprebajado AS valor_venta,
+            d.imprebajado * $igv->valor / 100 AS igv,
+            /*".$codtipoigv." AS codtipoigv,*/
+            CASE WHEN c.afecto_igv = 1 THEN '10' ELSE '20' END AS codtipoigv,
+            d.imprebajado * $igv->valor / 100 AS total_impuestos,
+            d.imprebajado + (d.imprebajado * $igv->valor / 100) AS precio_unitario
+            FROM cpe.vista_documentos_electronicos AS vde
+            ".$join."
+            WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} {$where_ciclo} AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
+        } else {
+            $sql_detalle_comprobante = "SELECT 
+            d.codconcepto AS codproducto,
+            'ZZ' AS codunidad, /* codunidad para servicios*/
+            c.descripcion AS producto,
+            1 AS cantidad,
+            d.importe AS valor_unitario,
+            d.importe AS valor_venta,
+            d.importe * $igv->valor / 100 AS igv,
+            /*".$codtipoigv." AS codtipoigv,*/
+            CASE WHEN c.afecto_igv = 1 THEN '10' ELSE '20' END AS codtipoigv,
+            d.importe * $igv->valor / 100 AS total_impuestos,
+            d.importe + (d.importe * $igv->valor / 100) AS precio_unitario
+            FROM cpe.vista_documentos_electronicos AS vde
+            ".$join."
+            WHERE vde.tabla='{$tabla}' AND vde.codemp={$codemp} AND vde.codsuc={$codsuc} AND vde.nroinscripcion={$nroinscripcion} {$where_ciclo} AND vde.idmovimiento={$id} AND d.codconcepto NOT IN(5,7,8)";
+        }
+       
+        // echo $sql_detalle_comprobante."<br>";
         $detalle_comprobante = $model->query($sql_detalle_comprobante)->fetchAll();
 
         if(count($detalle_comprobante) <= 0) {
@@ -637,14 +663,16 @@ function generar_resumen_diario($fecha, $codemp) {
                 
                
             // }
+            if($row->tabla != "facturacion.cabrebajas") {
+                $res = actualizar_pago($row);
 
-            $res = actualizar_pago($row);
-
-            if($res->errorCode() != '00000') {
-                $error = $res->errorInfo();
-                $mensaje = "Error al modificar: ".$row->tabla." ".$error[2];
-                throw new Exception($mensaje);
+                if($res->errorCode() != '00000') {
+                    $error = $res->errorInfo();
+                    $mensaje = "Error al modificar: ".$row->tabla." ".$error[2];
+                    throw new Exception($mensaje);
+                }
             }
+            
 
         }
 
@@ -762,7 +790,7 @@ $contador = 1;
 while($fechaCursor <= $fhasta) {
     // echo $fechaCursor."<br>";
     // RESUMEN DIARIO
-    $sql_boletas = "SELECT codemp FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND (codsunat='03' OR(codsunat='07' AND coddocumento='14'))
+    $sql_boletas = "SELECT codemp FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fechaCursor."' AND (codsunat='03' OR(codsunat='07' AND coddocumento='13'))
     GROUP BY codemp
     ORDER BY codemp ASC";
     // die($sql_boletas);
