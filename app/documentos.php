@@ -622,13 +622,24 @@ function generar_resumen_diario($fecha, $codemp) {
 
         while ($row = $documentos->fetch()) {
             if($cpe->getCode() === 0 ) {
-
-                if($row->dr_estado == "1") {
-
-                    $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido aceptada");
-                } else {
-                    $res = guardar_documento($row, $cpe, "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja");
+                $cdr_text = "";
+                if($row->codtipodocumento == "03" && $row->dr_estado == "1") {
+                    $cdr_text = "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido aceptada";
+                } elseif($row->codtipodocumento == "03" && $row->dr_estado != "1") {
+                    $cdr_text = "La Boleta número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja";
+                } elseif($row->codtipodocumento == "07" && $row->dr_estado == "1") {
+                    $cdr_text = "La Nota de Crédito número " . $row->serie."-".$row->correlativo . ", ha sido aceptada";
+                } elseif($row->codtipodocumento == "07" && $row->dr_estado != "1") {
+                    $cdr_text = "La Nota de Crédito número " . $row->serie."-".$row->correlativo . ", ha sido dado de baja";
                 }
+               
+                $res = guardar_documento($row, $cpe, $cdr_text);
+                // if($row->dr_estado == "1") {
+
+                //     $res = guardar_documento($row, $cpe, $cdr_text);
+                // } else {
+                //     $res = guardar_documento($row, $cpe, $cdr_text);
+                // }
             } else {
                 $res = guardar_documento($row, $cpe, "");
             }
@@ -712,7 +723,7 @@ function validar_resumen_diario($fecha, $codemp) {
                 while ($value = $series->fetch()) {
                     $r = $model->query("SELECT MAX(nrodocumentotri) AS nrodocumentotri 
                     FROM cpe.vista_documentos_electronicos 
-                    WHERE (to_char('".$fecha."'::date, 'YYYY')::integer - 1) < to_char(documentofecha, 'YYYY')::integer AND documentofecha<'".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp}")->fetch();
+                    WHERE (to_char('".$fecha."'::date, 'YYYY')::integer - 1) < to_char(documentofecha, 'YYYY')::integer AND documentofecha<'".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} AND (estado_documento='A' OR estado_documento IS NULL)")->fetch();
                     // echo "SELECT MAX(nrodocumentotri) AS nrodocumentotri 
                     // FROM cpe.vista_documentos_electronicos 
                     // WHERE documentofecha<'".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp}";
@@ -723,14 +734,14 @@ function validar_resumen_diario($fecha, $codemp) {
                     } else {
                         $r = $model->query("SELECT MIN(nrodocumentotri) AS nrodocumentotri 
                         FROM cpe.vista_documentos_electronicos 
-                        WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} ")->fetch();
+                        WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} AND (estado_documento='A' OR estado_documento IS NULL)")->fetch();
                 
                         $ultimo_correlativo_boletas = (int)$r->nrodocumentotri;
                     
                     }
                     // echo $ultimo_correlativo_boletas."\n";
                     $boletas = $model->query("SELECT * FROM cpe.vista_documentos_electronicos 
-                    WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} 
+                    WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} AND (estado_documento='A' OR estado_documento IS NULL)
                     ORDER BY nrodocumentotri ASC");
                     // echo "SELECT * FROM cpe.vista_documentos_electronicos 
                     // WHERE documentofecha='".$fecha."' AND codsunat='03' AND serie='".$value->serie."' AND codemp={$codemp} 
