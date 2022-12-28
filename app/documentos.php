@@ -172,6 +172,7 @@ function generar_comprobante($row) {
         // die($sql_detalle_comprobante);
         $detalle_comprobante = $model->query($sql_detalle_comprobante)->fetchAll();
 
+        // print_r($detalle_comprobante); exit;
 
         $cpe->comprobante($comprobante, $detalle_comprobante);
         // print_R($cpe); exit;
@@ -311,6 +312,15 @@ function generar_resumen_diario($fecha, $codemp) {
                 }
             } 
         }
+
+        // $detalle_resumen[0]->codtipodocumento = '07';
+        // $detalle_resumen[0]->serie = '07';
+        // $detalle_resumen[0]->correlativo = '07';
+        // $detalle_resumen[0]->correlativo = '07';
+
+
+
+
         // print_r($detalle_resumen);
         $cpe->resumen_diario($resumen, $detalle_resumen);
         // print_r($cpe); exit;
@@ -319,14 +329,15 @@ function generar_resumen_diario($fecha, $codemp) {
         if($cpe->getCode() !== 0) {
 
             $code = intval($cpe->getCodigoError());
-
-            if($code != 98 && $code != 99) {
-                $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
-                throw new Exception($mensaje);
-            } else {
-                $cpe->setCode($code);
-                $cpe->setObservaciones($cpe->getErrorDescripcion());
-            }
+            $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
+            throw new Exception($mensaje);
+            // if($code != 98 && $code != 99) {
+            //     $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
+            //     throw new Exception($mensaje);
+            // } else {
+            //     $cpe->setCode($code);
+            //     $cpe->setObservaciones($cpe->getErrorDescripcion());
+            // }
             
         }
         

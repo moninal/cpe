@@ -1,5 +1,4 @@
 <?php
-
 //  header('Access-Control-Allow-Origin: *');
 //  header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
 //  header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
@@ -9,12 +8,11 @@ use PHPMailer\PHPMailer\Exception;
 
 // require_once("funciones.php");
 require dirname(__DIR__).'/vendor/autoload.php';
- 
 $email = isset($argv[1]) ? $argv[1] : "";
 $nroinscripcion = isset($argv[2]) ? $argv[2] : "";
-$rutaarchivo = isset($argv[3]) ? $argv[3] : "";
+$rutaarchivo = isset($argv[3]) ? strtr($argv[3],"__"," ") : "";
 $rutaarchivo = strtr($rutaarchivo, "_"," ");
-$nombrecliente = isset($argv[4]) ? $argv[4] : "";   
+$nombrecliente = isset($argv[4]) ? strtr($argv[4], "__", " ") : "";
 $nombrecliente = strtr($nombrecliente, "_"," "); 
 
 $response = array();
@@ -92,7 +90,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $mail->Body = $Contenido;   
             //$pdf->stream(nombre_documento() . ".pdf", array("Attachment" => false));
 
-        $mail->addAttachment($rutaarchivo); 
+        $mail->addAttachment($rutaarchivo);
 
         
         

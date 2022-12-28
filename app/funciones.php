@@ -303,7 +303,7 @@ function crear_xml($row) {
         // die($sql_detalle_comprobante);
         $detalle_comprobante = $model->query($sql_detalle_comprobante)->fetchAll();
 
-
+        
         $cpe->comprobante($comprobante, $detalle_comprobante);
 
         $response["res"] = 1;

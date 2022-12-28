@@ -306,9 +306,11 @@ class CPE {
             ->setRedondeo($comprobante->redondeo) // si no hay poner cero
             ->setMtoImpVenta($comprobante->total); // es el total ya redondeado, lo que realmente se le va cobrar al cliente
 
-
-        foreach ($detalle_comprobante as $key => $value) {
-            $item = new SaleDetail();
+        // print_r($detalle_comprobante); exit;
+        
+        foreach ($detalle_comprobante as $key => $value) {        
+            // print_r($value);
+            $item = new SaleDetail();    
             $item->setCodProducto($value->codproducto)
                 ->setUnidad($value->codunidad)
                 ->setDescripcion($value->producto)
@@ -324,13 +326,14 @@ class CPE {
 
             if($comprobante->icbper_status == "S") {
                 
-            }
+            }            
 
-            
-
+            array_push($array_items, $item);
         }
+        
+        // print_r($array_items); exit;
 
-        array_push($array_items, $item);
+        
         // print_r($invoice); exit;
         $invoice->setDetails($array_items)
         ->setLegends([
