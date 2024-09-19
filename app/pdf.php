@@ -33,25 +33,32 @@
     }
 
     //PARA NOTAS CREDITO Y DEBITO
-    // if($_REQUEST["tipodoc_id"] == "07" || $_REQUEST["tipodoc_id"] == "08") {
-    //     $TipoDocumento = $_REQUEST["Nota"]["tipodoc_descripcion"];
-    //     $NroDocumentoI =  $_REQUEST["Nota"]["cliente_numero_documento"];
-    //     $Documento =  $_REQUEST["Nota"]["nota_documento"];
-    //     $Cliente =  $_REQUEST["Nota"]["cliente_nombres"];
-    //     $Fecha =  $_REQUEST["Nota"]["nota_fecha"];
-    //     $Hora =  $_REQUEST["Nota"]["nota_hora"];
-    //     $Direccion =  $_REQUEST["Nota"]["cliente_direccion"];
-    //     $Total =  $_REQUEST["Nota"]["nota_total"];
-    //     $Moneda =  $_REQUEST["Nota"]["moneda_descripcion"];
-    //     $FormaPago =  $_REQUEST["Nota"]["fp_descripcion"];
-    //     $DocumentoReferencia =  $_REQUEST["Nota"]["nota_documento_referencia"];
-    //     $Motivo =  $_REQUEST["Nota"]["motivo_descripcion"];
-    //     $Observacion =  $_REQUEST["Nota"]["nota_observacion"];
-    //     $AltoCliente = "115px";
-    //     $ICBPER = 0;
+    if($_REQUEST["tipodoc_id"] == "07" || $_REQUEST["tipodoc_id"] == "08") {
+        $TipoDocumento = $_REQUEST["Nota"]["tipodoc_descripcion"];
+        $NroDocumentoI =  $_REQUEST["Nota"]["cliente_numero_documento"];
+        $Documento =  $_REQUEST["Nota"]["nota_documento"];
+        $Cliente =  $_REQUEST["Nota"]["cliente_nombres"];
+        $Fecha =  $_REQUEST["Nota"]["nota_fecha"];
+        // $Hora =  $_REQUEST["Nota"]["nota_hora"];
+        $Direccion =  $_REQUEST["Nota"]["cliente_direccion"];
+        $Total =  $_REQUEST["Nota"]["nota_total"];
+        $Moneda =  $_REQUEST["Nota"]["moneda_descripcion"];
+        $FormaPago =  $_REQUEST["Nota"]["fp_descripcion"];
+        $DocumentoReferencia =  $_REQUEST["Nota"]["nota_documento_referencia"];
+        $Motivo =  $_REQUEST["Nota"]["motivo_descripcion"];
+        $Observacion =  $_REQUEST["Nota"]["nota_observacion"];
+        $AltoCliente = "110px";
+        
+        $ICBPER = 0;
+        $valor_venta =  number_format($_REQUEST["Nota"]["valor_venta"],2);
+        $igv_status =  $_REQUEST["Nota"]["igv_status"];
+        $subtotal =  number_format($_REQUEST["Nota"]["subtotal"],2);
+        $total_igv =  number_format($_REQUEST["Nota"]["igv"],2);
+        $redondeo =  number_format($_REQUEST["Nota"]["redondeo"],2);
+        $porcentaje_igv =  number_format($_REQUEST["Nota"]["porcentaje_igv"],2);
 		
 		
-    // }
+    }
 
 
 ?> 
@@ -274,11 +281,11 @@
                     <div class="col enfasis" style="width:2%;">
                         :
                     </div>
-                    <div class="col"  style="width:22%;">
+                    <div class="col"  style="width:59%;">
                         <?php echo $Motivo; ?>
                     </div>
 				
-                    <div class="col enfasis" style="width:12%;">
+                    <!-- <div class="col enfasis" style="width:12%;">
                         Descripci&oacute;n
                     </div>
                     <div class="col enfasis" style="width:2%;">
@@ -286,7 +293,7 @@
                     </div>
                     <div class="col"  style="width:23%;">
                         <?php echo $Observacion; ?>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="clear"></div>
             <?php } ?>
@@ -350,18 +357,40 @@
                 </div>
                 <div class="clear"></div>
                 <?php 
+                    $item = 1;
                     foreach ($_REQUEST["DetalleNota"] as $key => $value) {
-                        $importe = $value["dn_cantidad"]*$value["dn_precio"];
+                        // $importe = $value["cantidad"]*$value["precio_unitario"];
+                        // $importe = number_format(round($importe, 2), 2);
+                        // $cantidad = number_format(round($value["cantidad"], 2), 2);
+                        // echo '<div class="row">
+                        //         <div class="col" style="width: 50%;">'.$value["producto"].'</div>
+                        //         <div class="col" style="width: 20%;">'.$value["codunidad"].'</div>
+                        //         <div class="col" style="width: 10%; text-align: right;">'.$cantidad.'</div>
+                        //         <div class="col" style="width: 10%; text-align: right;">'.$value["precio_unitario"].'</div>
+                        //         <div class="col" style="width: 10%; text-align: right;">'.$importe.'</div>
+                        //     </div>
+                        //     <div class="clear"></div>';
+
+                        // print_r($value); exit;
+                        $importe = $value["cantidad"]*$value["precio_unitario"];
                         $importe = number_format(round($importe, 2), 2);
-                        $cantidad = number_format(round($value["dn_cantidad"], 2), 2);
+                        $cantidad = number_format(round($value["cantidad"], 2), 2);
+                        $igv = number_format($value["igv"], 2);
+                        $precio_unitario = number_format($value["precio_unitario"], 2);
+                        $valor_unitario = number_format($value["valor_unitario"], 2);
                         echo '<div class="row">
-                                <div class="col" style="width: 50%;">'.$value["producto_descripcion"].'</div>
-                                <div class="col" style="width: 20%;">'.$value["um_id"].'</div>
+                                <div class="col" style="width: 5%;">'.$item.'</div>
+                                <div class="col" style="width: 10%;">'.$value["codproducto"].'</div>
+                                <div class="col" style="width: 35%;">'.utf8_decode($value["producto"]).'</div>
+                                <div class="col" style="width: 5%; text-align: right;">'.$value["codunidad"].'</div>
                                 <div class="col" style="width: 10%; text-align: right;">'.$cantidad.'</div>
-                                <div class="col" style="width: 10%; text-align: right;">'.$value["dn_precio"].'</div>
-                                <div class="col" style="width: 10%; text-align: right;">'.$importe.'</div>
+                                <div class="col" style="width: 10%; text-align: right;">'.$valor_unitario.'</div>
+                                <div class="col" style="width: 8%; text-align: right;">'.$igv.'</div>
+                                <div class="col" style="width: 8%; text-align: right;">'.$precio_unitario.'</div>
+                                <div class="col" style="width: 9%; text-align: right;">'.$importe.'</div>
                             </div>
                             <div class="clear"></div>';
+                        $item++;
                     }
 
                 ?>

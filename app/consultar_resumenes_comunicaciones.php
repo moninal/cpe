@@ -19,7 +19,7 @@ while($value = $resumenes->fetch()) {
         $datos_update[":rd_observaciones"] = $cpe->getObservaciones();
         $datos_update[":rd_nombre_cdr"] = $cpe->getNombreCdr();
 
-        $model->modificar("cpe.resumenes_diarios", $datos_update, $where);
+        $model->modificar("cpe.resumenes_diarios", $datos_update, $where); 
 
 
         $sql_detalle = "SELECT * FROM cpe.detalle_resumen AS dr 

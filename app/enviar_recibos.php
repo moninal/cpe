@@ -23,10 +23,10 @@ $response = array();
 // $email_emisor = "fdfdlfjdlfj";
 // $pass_emisor = "fdfdlfjdlfj";
 // $port_emisor = "fdfdlfjdlfj";
-$host_email = "mail.emapica.com.pe";
-$email_emisor = "recibodigital@emapica.com.pe";
-$pass_emisor = "Otic$2022";
-$port_emisor = "465";
+$host_email = "mail.jjingenieros.pe";
+$email_emisor = "jcarbajal@jjingenieros.pe";
+$pass_emisor = "Sanchez75270586";
+$port_emisor = "587";
 
  
 
@@ -73,7 +73,7 @@ if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $mail->SMTPAuth   = true;   
         $mail->Username = $email_emisor;
         $mail->Password = $pass_emisor;
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;  // TLS: ENCRYPTION_STARTTLS, SSL: ENCRYPTION_SMTPS
+        $mail->SMTPSecure = "tls";  // TLS: ENCRYPTION_STARTTLS, SSL: ENCRYPTION_SMTPS
         $mail->Port       = $port_emisor; // si no quiere con el puerto 25 poner el puerto 587, al parecer en produccion va el puerto 587 y en desarollo el puerto 25,
         //o sino la mejor opcion es con SMTPSecure='ssl' y el puerto 665
 

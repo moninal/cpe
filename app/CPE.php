@@ -30,8 +30,9 @@ use Greenter\Model\Sale\Legend;
 use Greenter\Model\Summary\Summary;
 use Greenter\Model\Summary\SummaryDetail;
 
-// para el cdr
 use Greenter\Model\DocumentInterface;
+use Greenter\Model\Sale\Document;
+use Greenter\Model\Sale\Note;
 
 // para la comunicacion de baja
 use Greenter\Model\Voided\Voided;
@@ -280,7 +281,7 @@ class CPE {
         $invoice = new Invoice();
         $invoice
             ->setUblVersion('2.1')
-            ->setFecVencimiento(new DateTime($comprobante->fecha))
+            ->setFecVencimiento(new DateTime($comprobante->fechavencimiento))
             ->setTipoOperacion('0101') // Catalog. 51
             ->setTipoDoc($comprobante->codtipodocumento)
             ->setSerie($comprobante->serie) // 4 caracteres 
@@ -307,10 +308,10 @@ class CPE {
             ->setMtoImpVenta($comprobante->total); // es el total ya redondeado, lo que realmente se le va cobrar al cliente
 
         // print_r($detalle_comprobante); exit;
-        
-        foreach ($detalle_comprobante as $key => $value) {        
+
+        foreach ($detalle_comprobante as $key => $value) {
             // print_r($value);
-            $item = new SaleDetail();    
+            $item = new SaleDetail();
             $item->setCodProducto($value->codproducto)
                 ->setUnidad($value->codunidad)
                 ->setDescripcion($value->producto)
@@ -326,14 +327,14 @@ class CPE {
 
             if($comprobante->icbper_status == "S") {
                 
-            }            
+            }
 
             array_push($array_items, $item);
         }
-        
+
         // print_r($array_items); exit;
 
-        
+
         // print_r($invoice); exit;
         $invoice->setDetails($array_items)
         ->setLegends([
@@ -360,37 +361,83 @@ class CPE {
         $array_detail = array();
         $this->codtipodocumento = "RD"; 
         foreach ($detalle_resumen as $key => $value) {
-
+        //    print_r($value->codtipodocumento); exit;
             // $estado = '1'; 
             // if ($value->estado == "0") { // 0: ANULADO. 1: ACTIVO
             //     $estado = '3';
             // }
-            $detail = new SummaryDetail();
-            $detail->setTipoDoc($value->codtipodocumento)
-                ->setSerieNro($value->serie."-".$value->correlativo)
-                ->setEstado($value->dr_estado) // cat 19 1 -> adicionar, 2-> modificar, 3 -> anulado,
-            //4 anulado en el dia antes de informar comprobante, transporte publico,
-            //18/04/2022 ya no hay codigo 4 en el nuevo catalogo: usar codigo 3 nomas
-                // 08/05/2021:
-                // 1: Se esta informando por primera vez.
-                // 2: Se informó previamente y se quiere editar sus valores.
-                // 3: Se quiere anular el comprobante
-                ->setClienteTipo($value->codtipodocumentoidentidad) // suponiendo que es el tipo de documento de identidad
-                ->setClienteNro($value->nrodocumentoidentidad) // el numero de documento de identidad
-                ->setTotal($value->total);
-            if($value->igv_status == "S") {
-                $detail->setMtoOperGravadas($value->valor_venta); // 
-            } else {
-                $detail->setMtoOperExoneradas($value->valor_venta); // 
+            if($value->codtipodocumento == "03") {
+
+                $detail = new SummaryDetail();
+                $detail->setTipoDoc($value->codtipodocumento)
+                    ->setSerieNro($value->serie."-".$value->correlativo)
+                    ->setEstado($value->dr_estado) // cat 19 1 -> adicionar, 2-> modificar, 3 -> anulado,
+                //4 anulado en el dia antes de informar comprobante, transporte publico,
+                //18/04/2022 ya no hay codigo 4 en el nuevo catalogo: usar codigo 3 nomas
+                    // 08/05/2021:
+                    // 1: Se esta informando por primera vez.
+                    // 2: Se informó previamente y se quiere editar sus valores.
+                    // 3: Se quiere anular el comprobante
+                    ->setClienteTipo($value->codtipodocumentoidentidad) // suponiendo que es el tipo de documento de identidad
+                    ->setClienteNro($value->nrodocumentoidentidad) // el numero de documento de identidad
+                    ->setTotal($value->total);
+                if($value->igv_status == "S") {
+                    $detail->setMtoOperGravadas($value->valor_venta); //
+                } else {
+                    $detail->setMtoOperExoneradas($value->valor_venta); //
+                }
+
+                    //->setMtoOperInafectas(24.4)  // no se usa
+                    //->setMtoOperExoneradas($value->imptotal)  //
+                    //->setMtoOtrosCargos(21) // no se usa
+                    $detail->setMtoIGV($value->igv); // si no hay o no toma en cuenta igv, se pone cero nomas
+                //     echo "<pre>";
+                // print_r($detail);
+            } elseif($value->codtipodocumento == "07" && $value->coddocumento == "13")  { // para notas de credito de boletas
+
+				// $sql_referencia = "SELECT ((seriedocumento::text) || '-'::text) ||
+				// btrim(to_char(nrodocumento, '00000000'::text)) AS nota_documento_referencia FROM facturacion.detrebajas WHERE nrorebaja={$value->idmovimiento}";
+
+				// echo $sql_referencia;
+				// $r = $model->query($sql_referencia)->fetch();
+
+                $detail = new SummaryDetail();
+                $detail->setTipoDoc($value->codtipodocumento)
+                    ->setSerieNro($value->serie."-".$value->correlativo)
+                    ->setDocReferencia((new Document())
+                    	->setTipoDoc("03")
+                    	->setNroDoc("B102-00040408"))
+                    ->setEstado(2) // cat 19 1 -> adicionar, 2-> modificar, 3 -> anulado,
+                //4 anulado en el dia antes de informar comprobante, transporte publico,
+                //18/04/2022 ya no hay codigo 4 en el nuevo catalogo: usar codigo 3 nomas
+                    // 08/05/2021:
+                    // 1: Se esta informando por primera vez.
+                    // 2: Se informó previamente y se quiere editar sus valores.
+                    // 3: Se quiere anular el comprobante
+                    ->setClienteTipo($value->codtipodocumentoidentidad) // suponiendo que es el tipo de documento de identidad
+                    ->setClienteNro($value->nrodocumentoidentidad) // el numero de documento de identidad
+                    ->setTotal($value->total);
+                if($value->igv_status == "S") {
+                    $detail->setMtoOperGravadas($value->valor_venta); //
+                } else {
+                    $detail->setMtoOperExoneradas($value->valor_venta); //
+                }
+
+                    //->setMtoOperInafectas(24.4)  // no se usa
+                    //->setMtoOperExoneradas($value->imptotal)  //
+                    //->setMtoOtrosCargos(21) // no se usa
+                    $detail->setMtoIGV($value->igv); // si no hay o no toma en cuenta igv, se pone cero nomas
+                //     echo "<pre>";
+                // print_r($detail);
             }
-                
-                //->setMtoOperInafectas(24.4)  // no se usa
-                //->setMtoOperExoneradas($value->imptotal)  // 
-                //->setMtoOtrosCargos(21) // no se usa
-                $detail->setMtoIGV($value->igv); // si no hay o no toma en cuenta igv, se pone cero nomas
-            //     echo "<pre>";
-            // print_r($detail);
-            array_push($array_detail, $detail);
+
+
+
+            if(isset($detail)) {
+                array_push($array_detail, $detail);
+                unset($detail);
+            }
+            // echo $value->serie."-".$value->correlativo."<=>".count($array_detail)."\n";
             
         }
      

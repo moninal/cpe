@@ -104,6 +104,7 @@ function generar_comprobante($row) {
         vde.subtotal AS valor_venta,
         vde.igv,
         vde.documentofecha AS fecha,
+        vde.fechavencimiento ,
         'PEN' AS codmoneda,
         vde.redondeo * -1 AS redondeo,
         (vde.subtotal + vde.igv) AS subtotal,
@@ -267,6 +268,7 @@ function generar_resumen_diario($fecha, $codemp) {
         $resumen["fecha_resumen"] = $fecha;
         $resumen["fecha_generacion"] = $fecha;
         $resumen["correlativo"] = (string)$correlativo;
+        // $resumen["correlativo"] = '2';
         $resumen = (object)$resumen;
         //18/04/2022 ya no hay codigo 4 en el nuevo catalogo: usar codigo 3 nomas, para el dr_estado
         $sql_detalle_resumen = "SELECT 
@@ -313,23 +315,35 @@ function generar_resumen_diario($fecha, $codemp) {
             } 
         }
 
-        // $detalle_resumen[0]->codtipodocumento = '07';
-        // $detalle_resumen[0]->serie = '07';
-        // $detalle_resumen[0]->correlativo = '07';
-        // $detalle_resumen[0]->correlativo = '07';
+        // $detalle_resumen = array();
 
+        // $detalle_resumen["codtipodocumento"] = '07';
+        // $detalle_resumen["coddocumento"] = '13';
+        // $detalle_resumen["serie"] = 'B102';
+        // $detalle_resumen["correlativo"] = '00000001';
+        // $detalle_resumen["codtipodocumentoidentidad"] = '1';
+        // $detalle_resumen["nrodocumentoidentidad"] = '72184269';
+        // $detalle_resumen["total"] = 708.53;
+        // $detalle_resumen["igv_status"] = 'S';
+        // $detalle_resumen["valor_venta"] = 600.45;
+        // $detalle_resumen["igv"] = 108.08;
 
+        // $detalle_resumen = (object)$detalle_resumen;
 
+        // $sql_detalle_resumen ="SELECT '07' as codtipodocumento, '13' as coddocumento, 'B102' as serie, '00000001' as correlativo, '1' as codtipodocumentoidentidad, '72184269' as nrodocumentoidentidad, 708.53 as total, 'S' as igv_status, 600.45 as valor_venta, 108.08 as igv";
 
-        // print_r($detalle_resumen);
+        // $detalle_resumen = $model->query($sql_detalle_resumen)->fetchAll();
+
+        // print_r($detalle_resumen); exit;
         $cpe->resumen_diario($resumen, $detalle_resumen);
-        // print_r($cpe); exit;
+         //print_r($cpe); exit;
         $cpe->enviar_sunat();
+         //print_r($cpe); exit;
         // var_dump($cpe->getCode()); exit;
         if($cpe->getCode() !== 0) {
 
             $code = intval($cpe->getCodigoError());
-            $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
+            $mensaje = "Error en resumen de la fechas: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
             throw new Exception($mensaje);
             // if($code != 98 && $code != 99) {
             //     $mensaje = "Error en resumen de la fecha: ".$fecha." error: ".$cpe->getCodigoError().", ".$cpe->getErrorDescripcion();
@@ -431,6 +445,7 @@ function validar_resumen_diario($fecha, $codemp) {
 
     $result = array();
     try {
+
     //     $model->getPDO()->beginTransaction();
         $model->query("SELECT * FROM cpe.vista_documentos_electronicos WHERE documentofecha='".$fecha."' AND codsunat='03' AND codemp={$codemp}");
         
